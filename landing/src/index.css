@@ -1,0 +1,121 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Playful Brutalism Design System ──────────────────────────── */
+:root {
+  --peach:    #FAE8D8;
+  --yellow:   #F5C842;
+  --pink:     #F03E7A;
+  --teal:     #2EC4B6;
+  --lavender: #9B8FE8;
+  --coral:    #FF6B35;
+  --dark:     #1A1A1A;
+  --white:    #FFFFFF;
+  --muted:    #6B6B6B;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #FAE8D8;
+  color: #1A1A1A;
+  font-family: 'Inter', sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  letter-spacing: -0.02em;
+  color: #1A1A1A;
+}
+
+/* ── Float Keyframes ───────────────────────────────────────────── */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-12px); }
+}
+
+@keyframes float-rotate {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50%       { transform: translateY(-8px) rotate(12deg); }
+}
+
+@keyframes float-left {
+  0%, 100% { transform: translateX(0px); }
+  50%       { transform: translateX(-10px); }
+}
+
+/* ── Floating shape helpers ────────────────────────────────────── */
+.shape-float { animation: float 5s ease-in-out infinite; }
+.shape-float-slow { animation: float 7s ease-in-out infinite; }
+.shape-float-delay1 { animation: float 4s ease-in-out 0.5s infinite; }
+.shape-float-delay2 { animation: float 6s ease-in-out 1s infinite; }
+.shape-float-delay3 { animation: float 4.5s ease-in-out 0.8s infinite; }
+.shape-rotate { animation: float-rotate 5s ease-in-out 1.2s infinite; }
+
+/* ── Scrollbar ─────────────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: #FAE8D8; }
+::-webkit-scrollbar-thumb { background: #1A1A1A; border-radius: 2px; }
+
+::selection {
+  background: #F5C842;
+  color: #1A1A1A;
+}
+
+.scrollbar-none {
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── Page-wrapper & Content-card ───────────────────────────────── */
+.page-wrapper {
+  background: #FAE8D8;
+  min-height: 100vh;
+  padding: 20px;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.content-card {
+  background: #FFFFFF;
+  border: 3px solid #1A1A1A;
+  border-radius: 24px;
+  overflow: hidden;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Floating shapes container ─────────────────────────────────── */
+.shapes-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}

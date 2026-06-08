@@ -1,0 +1,13 @@
+{
+  "buildCommand": "npm install",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "env": {
+    "FIREBASE_PROJECT_ID": "@firebase_project_id",
+    "FIREBASE_PRIVATE_KEY": "@firebase_private_key",
+    "FIREBASE_CLIENT_EMAIL": "@firebase_client_email",
+    "NODE_ENV": "production",
+    "PORT": "3000",
+    "CORS_ORIGIN": "@cors_origin"
+  }
+}

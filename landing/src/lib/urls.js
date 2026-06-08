@@ -3,10 +3,19 @@ const DEFAULT_PROD_CLIENT_URL = 'https://care-bridge-hp9u.vercel.app';
 
 /** After sign-in on landing, send the user to the client app with a short-lived ID token. */
 export async function redirectToClientAfterAuth(user) {
-  const idToken = await user.getIdToken();
-  const url = new URL(getClientUrl());
-  url.searchParams.set('auth', idToken);
-  window.location.href = url.toString();
+  try {
+    const idToken = await user.getIdToken();
+    const clientUrl = getClientUrl();
+    console.log('🔄 Redirecting to client:', clientUrl);
+    const url = new URL(clientUrl);
+    url.searchParams.set('auth', idToken);
+    const redirectUrl = url.toString();
+    console.log('✓ Redirect URL:', redirectUrl);
+    window.location.href = redirectUrl;
+  } catch (error) {
+    console.error('❌ Redirect error:', error);
+    throw error;
+  }
 }
 
 function isLocalHost() {

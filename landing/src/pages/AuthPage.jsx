@@ -99,9 +99,10 @@ export default function AuthPage() {
         });
       }
 
+      console.log('✅ Email sign-in successful, redirecting...');
       await redirectToClientAfterAuth(user);
     } catch (err) {
-      console.error('Email sign-in error:', err);
+      console.error('❌ Email sign-in error:', err);
       
       if (err.code === 'auth/wrong-password') {
         setError('Wrong password. Try again.');
@@ -113,6 +114,8 @@ export default function AuthPage() {
         setError('Password should be at least 6 characters.');
       } else if (err.code === 'auth/unauthorized-domain') {
         setError('Auth domain not configured. Add localhost to Firebase authorized domains.');
+      } else if (err.message?.includes('Redirect')) {
+        setError(`Redirect failed: ${err.message}. Check VITE_CLIENT_URL environment variable.`);
       } else {
         setError(err.message || 'Sign in failed. Please try again.');
       }
@@ -149,15 +152,18 @@ export default function AuthPage() {
         });
       }
 
+      console.log('✅ Google sign-in successful, redirecting...');
       await redirectToClientAfterAuth(user);
     } catch (err) {
-      console.error('Sign-in error:', err);
+      console.error('❌ Sign-in error:', err);
       if (err.code === 'auth/popup-closed-by-user') {
         setError('Sign-in cancelled. Please try again.');
       } else if (err.code === 'auth/configuration-not-found') {
         setError('Firebase auth not configured for this domain.');
       } else if (err.code === 'auth/unauthorized-domain') {
         setError('Auth domain not configured. Add localhost to Firebase authorized domains.');
+      } else if (err.message?.includes('Redirect')) {
+        setError(`Redirect failed: ${err.message}. Check VITE_CLIENT_URL environment variable.`);
       } else {
         setError(err.message || 'Sign-in failed. Please try again.');
       }

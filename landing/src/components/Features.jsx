@@ -13,7 +13,7 @@ const features = [
     ),
   },
   {
-    cardBg: '#FFF0F5',
+    cardBg: '#FFFFFF',
     iconBg: '#F03E7A',
     title: 'Emergency Booking',
     body: 'SOS! Need a stylist in 2 hours? We alert nearby professionals and get you covered fast.',
@@ -24,7 +24,7 @@ const features = [
     ),
   },
   {
-    cardBg: '#F0FFFE',
+    cardBg: '#FFFFFF',
     iconBg: '#2EC4B6',
     title: 'Smart Matching',
     body: 'AI-powered matching based on style, budget, proximity, and past preferences.',
@@ -35,7 +35,7 @@ const features = [
     ),
   },
   {
-    cardBg: '#F5F3FF',
+    cardBg: '#FFFFFF',
     iconBg: '#9B8FE8',
     title: 'Predictive Planner',
     body: 'Wingman reads your calendar and suggests grooming slots before important events.',
@@ -46,7 +46,7 @@ const features = [
     ),
   },
   {
-    cardBg: '#FFF8EC',
+    cardBg: '#FFFFFF',
     iconBg: '#F5C842',
     title: 'Style Preview',
     body: 'See AI-generated previews of recommended styles before you commit to a booking.',
@@ -57,7 +57,7 @@ const features = [
     ),
   },
   {
-    cardBg: '#FFF0F5',
+    cardBg: '#FFFFFF',
     iconBg: '#F03E7A',
     title: 'Beauty Twin',
     body: 'Build your AI beauty profile. Wingman learns your preferences and improves every booking.',
@@ -80,7 +80,7 @@ export default function Features() {
             display: 'inline-block',
             fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: '12px',
             letterSpacing: '0.08em', textTransform: 'uppercase',
-            background: '#F03E7A', color: '#FFFFFF',
+            background: '#FFFFFF', color: '#1A1A1A',
             border: '2px solid #1A1A1A', borderRadius: '999px',
             padding: '5px 14px', marginBottom: '16px',
           }}>
@@ -92,7 +92,7 @@ export default function Features() {
             color: '#1A1A1A', margin: 0,
           }}>
             Everything you need,{' '}
-            <span style={{ color: '#F03E7A' }}>nothing you don't.</span>
+            <span style={{ color: '#1A1A1A' }}>nothing you don't.</span>
           </h2>
         </div>
 

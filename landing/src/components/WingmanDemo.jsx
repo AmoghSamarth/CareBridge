@@ -160,8 +160,8 @@ export default function WingmanDemo() {
             {[
               { bg: '#F5C842', num: '4.9', label: 'AVG RATING', textColor: '#1A1A1A' },
               { bg: '#F03E7A', num: '120+', label: 'DAILY VISITS', textColor: '#FFFFFF' },
-              { bg: '#2EC4B6', num: '2H', label: 'SOS RESPONSE', textColor: '#1A1A1A' },
-              { bg: '#9B8FE8', num: '500+', label: 'USERS', textColor: '#FFFFFF' },
+              { bg: '#FFFFFF', num: '2H', label: 'SOS RESPONSE', textColor: '#1A1A1A' },
+              { bg: '#FFFFFF', num: '500+', label: 'USERS', textColor: '#1A1A1A' },
             ].map((s, i) => (
               <div key={i} style={{
                 background: s.bg, border: '2.5px solid #1A1A1A',

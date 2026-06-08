@@ -1,13 +1,29 @@
+/*
+  FIREBASE AUTH DOMAIN FIX:
+  If you see "Firebase auth not configured for this domain", follow these steps:
+  1. Go to console.firebase.google.com
+  2. Select your carebridge project
+  3. Left sidebar → Build → Authentication
+  4. Click "Settings" tab
+  5. Scroll to "Authorized domains"
+  6. Click "Add domain"
+  7. Add: localhost
+  8. If using Vercel: also add your .vercel.app URL
+  9. Click Save
+  10. Refresh your app and try signing in again
+*/
+
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import {
   auth, db, isFirebaseInitialized,
   signInWithPopup, GoogleAuthProvider,
+  signInWithEmailAndPassword, createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
 } from '../lib/firebase.js';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
-
-const CLIENT_URL = import.meta.env.VITE_CLIENT_URL || 'https://care-bridge-hp9u.vercel.app';
+import { getClientUrl } from '../lib/urls.js';
 
 const GoogleIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24">
@@ -32,10 +48,79 @@ const featureRows = [
 
 export default function AuthPage() {
   const navigate = useNavigate();
-  const [step, setStep] = useState(1); // 1: role select, 2: google sign-in
+  const [step, setStep] = useState(1); // 1: role select, 2: sign-in
   const [role, setRole] = useState(null); // 'customer' | 'professional'
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+
+  const handleEmailSignIn = async () => {
+    if (!email || !password) {
+      setError('Please enter both email and password.');
+      return;
+    }
+    
+    if (!isFirebaseInitialized || !auth || !db) {
+      setError('Firebase is not configured. Please check your environment variables.');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+    setSuccessMessage('');
+
+    try {
+      let result;
+      try {
+        // Try to sign in existing user
+        result = await signInWithEmailAndPassword(auth, email, password);
+      } catch (err) {
+        if (err.code === 'auth/user-not-found') {
+          // Create new user
+          result = await createUserWithEmailAndPassword(auth, email, password);
+        } else {
+          throw err;
+        }
+      }
+
+      const user = result.user;
+      const userRef = doc(db, 'users', user.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (!userSnap.exists()) {
+        await setDoc(userRef, {
+          email: user.email,
+          role: role || 'customer',
+          onboarding_complete: false,
+          created_at: serverTimestamp(),
+        });
+      }
+
+      // Redirect to client app
+      window.location.href = getClientUrl();
+    } catch (err) {
+      console.error('Email sign-in error:', err);
+      
+      if (err.code === 'auth/wrong-password') {
+        setError('Wrong password. Try again.');
+      } else if (err.code === 'auth/user-not-found') {
+        setError('No account with this email. Check spelling or sign up.');
+      } else if (err.code === 'auth/invalid-email') {
+        setError('Invalid email address.');
+      } else if (err.code === 'auth/weak-password') {
+        setError('Password should be at least 6 characters.');
+      } else if (err.code === 'auth/unauthorized-domain') {
+        setError('Auth domain not configured. Add localhost to Firebase authorized domains.');
+      } else {
+        setError(err.message || 'Sign in failed. Please try again.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleGoogleSignIn = async () => {
     if (!isFirebaseInitialized || !auth || !db) {
@@ -44,6 +129,7 @@ export default function AuthPage() {
     }
     setLoading(true);
     setError('');
+    setSuccessMessage('');
     try {
       const provider = new GoogleAuthProvider();
       const result = await signInWithPopup(auth, provider);
@@ -65,15 +151,42 @@ export default function AuthPage() {
       }
 
       // Redirect to client app
-      window.location.href = CLIENT_URL;
+      window.location.href = getClientUrl();
     } catch (err) {
       console.error('Sign-in error:', err);
       if (err.code === 'auth/popup-closed-by-user') {
         setError('Sign-in cancelled. Please try again.');
       } else if (err.code === 'auth/configuration-not-found') {
         setError('Firebase auth not configured for this domain.');
+      } else if (err.code === 'auth/unauthorized-domain') {
+        setError('Auth domain not configured. Add localhost to Firebase authorized domains.');
       } else {
         setError(err.message || 'Sign-in failed. Please try again.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePasswordReset = async () => {
+    if (!email) {
+      setError('Enter your email to reset password.');
+      return;
+    }
+    
+    setLoading(true);
+    setError('');
+    setSuccessMessage('');
+
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setSuccessMessage('Reset link sent to your email.');
+      setError('');
+    } catch (err) {
+      if (err.code === 'auth/user-not-found') {
+        setError('No account with this email.');
+      } else {
+        setError('Failed to send reset link. Try again.');
       }
     } finally {
       setLoading(false);
@@ -257,7 +370,7 @@ export default function AuthPage() {
               </motion.div>
             )}
 
-            {/* Step 2: Google sign-in */}
+            {/* Step 2: Sign in */}
             {step === 2 && (
               <motion.div
                 key="step2"
@@ -310,12 +423,148 @@ export default function AuthPage() {
 
                 {error && (
                   <div style={{
-                    background: '#FFF0F5', border: '2px solid #F03E7A',
+                    background: '#FFF0F5', border: '2.5px solid #F03E7A',
                     borderRadius: '10px', padding: '12px 16px', marginBottom: '16px',
                   }}>
-                    <p style={{ fontFamily: 'Inter', fontSize: '13px', color: '#F03E7A', margin: 0 }}>{error}</p>
+                    <p style={{ fontFamily: 'Inter', fontSize: '13px', color: '#F03E7A', margin: 0, fontWeight: 500 }}>{error}</p>
                   </div>
                 )}
+
+                {successMessage && (
+                  <div style={{
+                    background: '#F0FFFE', border: '2.5px solid #2EC4B6',
+                    borderRadius: '10px', padding: '12px 16px', marginBottom: '16px',
+                  }}>
+                    <p style={{ fontFamily: 'Inter', fontSize: '13px', color: '#2EC4B6', margin: 0, fontWeight: 500 }}>{successMessage}</p>
+                  </div>
+                )}
+
+                {/* Email input */}
+                <input
+                  type="email"
+                  placeholder="your@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={loading}
+                  style={{
+                    width: '100%',
+                    padding: '14px 16px',
+                    marginBottom: '12px',
+                    fontFamily: 'Inter',
+                    fontSize: '16px',
+                    border: error && email ? '2.5px solid #F03E7A' : '2.5px solid #1A1A1A',
+                    borderRadius: '12px',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                  }}
+                  onKeyDown={(e) => e.key === 'Enter' && password && handleEmailSignIn()}
+                />
+
+                {/* Password input */}
+                <div style={{ position: 'relative', marginBottom: '6px' }}>
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={loading}
+                    style={{
+                      width: '100%',
+                      padding: '14px 16px',
+                      paddingRight: '44px',
+                      fontFamily: 'Inter',
+                      fontSize: '16px',
+                      border: error && password ? '2.5px solid #F03E7A' : '2.5px solid #1A1A1A',
+                      borderRadius: '12px',
+                      outline: 'none',
+                      boxSizing: 'border-box',
+                    }}
+                    onKeyDown={(e) => e.key === 'Enter' && email && handleEmailSignIn()}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    style={{
+                      position: 'absolute',
+                      right: '12px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      background: 'none',
+                      border: 'none',
+                      cursor: 'pointer',
+                      fontSize: '14px',
+                      color: '#6B6B6B',
+                    }}
+                  >
+                    {showPassword ? '👁' : '👁‍🗨'}
+                  </button>
+                </div>
+
+                <button
+                  onClick={handlePasswordReset}
+                  style={{
+                    display: 'block',
+                    marginBottom: '16px',
+                    fontFamily: 'Inter',
+                    fontSize: '12px',
+                    color: '#6B6B6B',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    textDecoration: 'underline',
+                  }}
+                >
+                  Forgot password?
+                </button>
+
+                {/* Email sign-in button */}
+                <button
+                  onClick={handleEmailSignIn}
+                  disabled={loading || !email || !password}
+                  style={{
+                    width: '100%',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px',
+                    fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '15px', color: '#1A1A1A',
+                    background: '#F5C842',
+                    border: '2.5px solid #1A1A1A',
+                    borderRadius: '12px',
+                    boxShadow: '4px 4px 0 #1A1A1A',
+                    padding: '14px',
+                    cursor: loading ? 'wait' : 'pointer',
+                    transition: 'transform 0.15s, box-shadow 0.15s',
+                    marginBottom: '6px',
+                    opacity: (loading || !email || !password) ? 0.6 : 1,
+                  }}
+                  onMouseEnter={e => { if (!loading && email && password) { e.currentTarget.style.transform = 'translate(-2px,-2px)'; e.currentTarget.style.boxShadow = '6px 6px 0 #1A1A1A'; } }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '4px 4px 0 #1A1A1A'; }}
+                >
+                  {loading ? (
+                    <span style={{ display: 'flex', gap: '4px' }}>
+                      {[0, 1, 2].map(i => (
+                        <motion.span key={i}
+                          style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#1A1A1A', display: 'block' }}
+                          animate={{ y: [0, -5, 0] }} transition={{ duration: 0.5, repeat: Infinity, delay: i * 0.12 }}
+                        />
+                      ))}
+                    </span>
+                  ) : (
+                    'SIGN IN WITH EMAIL'
+                  )}
+                </button>
+
+                <p style={{ fontFamily: 'Inter', fontSize: '12px', color: '#6B6B6B', textAlign: 'center', margin: '12px 0' }}>
+                  New user? Password will be created automatically on first sign in.
+                </p>
+
+                {/* Divider */}
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: '12px',
+                  margin: '20px 0',
+                }}>
+                  <div style={{ flex: 1, height: '1px', background: 'rgba(26,26,26,0.2)' }} />
+                  <span style={{ fontFamily: 'Inter', fontSize: '14px', color: '#6B6B6B' }}>OR</span>
+                  <div style={{ flex: 1, height: '1px', background: 'rgba(26,26,26,0.2)' }} />
+                </div>
 
                 {/* Google button */}
                 <button

@@ -46,7 +46,7 @@ export default function CityLaunch() {
             display: 'inline-flex', alignItems: 'center', gap: '8px',
             fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: '13px',
             letterSpacing: '0.06em', textTransform: 'uppercase',
-            background: '#2EC4B6', color: '#1A1A1A',
+            background: '#FFFFFF', color: '#1A1A1A',
             border: '2px solid #1A1A1A', borderRadius: '999px',
             padding: '6px 16px',
           }}>
@@ -79,7 +79,7 @@ export default function CityLaunch() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               style={{
-                background: '#2EC4B6', border: '2.5px solid #1A1A1A',
+                background: '#FFFFFF', border: '2.5px solid #1A1A1A',
                 borderRadius: '16px', boxShadow: '5px 5px 0 #1A1A1A',
                 padding: '24px 32px',
               }}
@@ -88,7 +88,7 @@ export default function CityLaunch() {
               <p style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '18px', color: '#1A1A1A', marginTop: '8px' }}>
                 You're on the list!
               </p>
-              <p style={{ fontFamily: 'Inter', fontSize: '14px', color: '#1A1A1A', opacity: 0.8 }}>
+              <p style={{ fontFamily: 'Inter', fontSize: '14px', color: '#6B6B6B', opacity: 0.8 }}>
                 We'll email you as soon as CareBridge launches in Nagpur.
               </p>
             </motion.div>

@@ -37,7 +37,7 @@ export default function Footer() {
               <p style={{
                 fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '12px',
                 letterSpacing: '0.08em', textTransform: 'uppercase',
-                color: '#F5C842', marginBottom: '16px',
+                color: '#FFFFFF', marginBottom: '16px',
               }}>
                 {heading}
               </p>

@@ -41,16 +41,16 @@ export default function FAQ() {
         </div>
 
         {/* Items */}
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', background: '#FFFFFF', border: '2px solid #1A1A1A', borderRadius: '16px', overflow: 'hidden' }}>
           {items.map((item, i) => {
             const isOpen = open === i;
             return (
               <div
                 key={i}
                 style={{
-                  borderBottom: '2px solid #1A1A1A',
-                  borderLeft: isOpen ? '5px solid #F03E7A' : '5px solid transparent',
-                  background: isOpen ? 'rgba(240,62,122,0.05)' : 'transparent',
+                  borderBottom: i < items.length - 1 ? '2px solid #1A1A1A' : 'none',
+                  borderLeft: isOpen ? '5px solid #F5C842' : '5px solid transparent',
+                  background: 'transparent',
                   transition: 'all 0.2s',
                 }}
               >
@@ -77,7 +77,7 @@ export default function FAQ() {
                   </span>
                   <span style={{
                     fontSize: '20px',
-                    color: isOpen ? '#F03E7A' : '#1A1A1A',
+                    color: isOpen ? '#F5C842' : '#1A1A1A',
                     transform: isOpen ? 'rotate(45deg)' : 'rotate(0)',
                     transition: 'transform 0.2s, color 0.2s',
                     lineHeight: 1,

@@ -4,22 +4,20 @@ const ThemeContext = createContext();
 
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(() => {
-    return localStorage.getItem("carebridge-theme") || "dark";
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("cb-theme") || "light";
+    }
+    return "light";
   });
 
   useEffect(() => {
     const root = document.documentElement;
-    if (theme === "dark") {
-      root.classList.add("dark");
-      root.classList.remove("light");
-    } else {
-      root.classList.add("light");
-      root.classList.remove("dark");
-    }
-    localStorage.setItem("carebridge-theme", theme);
+    root.setAttribute("data-theme", theme);
+    localStorage.setItem("cb-theme", theme);
   }, [theme]);
 
-  const toggle = () => setTheme(t => t === "dark" ? "light" : "dark");
+  const toggle = () => 
+    setTheme(t => t === "light" ? "dark" : "light");
 
   return (
     <ThemeContext.Provider value={{ theme, toggle }}>

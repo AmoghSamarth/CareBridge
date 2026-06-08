@@ -187,24 +187,6 @@ export default function Hero() {
         {/* Left 55% */}
         <div style={{ flex: '1 1 420px', maxWidth: '580px', display: 'flex', flexDirection: 'column', gap: '28px' }}>
 
-          {/* Badge */}
-          <span style={{
-            display: 'inline-block',
-            fontFamily: 'Plus Jakarta Sans',
-            fontWeight: 700,
-            fontSize: '12px',
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-            background: '#FAE8D8',
-            border: '2px solid #1A1A1A',
-            borderRadius: '999px',
-            padding: '6px 16px',
-            color: '#1A1A1A',
-            width: 'fit-content',
-          }}>
-            ✦ AI Grooming Companion
-          </span>
-
           {/* Headline */}
           <h1 style={{
             fontFamily: 'Plus Jakarta Sans',
@@ -262,28 +244,6 @@ export default function Hero() {
             >
               BROWSE PROFESSIONALS
             </button>
-          </div>
-
-          {/* Trust row */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', paddingTop: '4px' }}>
-            <div style={{ display: 'flex' }}>
-              {['#F03E7A', '#2EC4B6', '#9B8FE8'].map((bg, i) => (
-                <div key={i} style={{
-                  width: '32px', height: '32px', borderRadius: '50%',
-                  background: bg, border: '2px solid #1A1A1A',
-                  marginLeft: i === 0 ? 0 : '-8px',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  zIndex: 3 - i,
-                }}>
-                  <span style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '11px', color: '#fff' }}>
-                    {['A','P','R'][i]}
-                  </span>
-                </div>
-              ))}
-            </div>
-            <span style={{ fontFamily: 'Inter', fontWeight: 500, fontSize: '14px', color: '#1A1A1A' }}>
-              Trusted by 500+ Nagpur residents
-            </span>
           </div>
         </div>
 

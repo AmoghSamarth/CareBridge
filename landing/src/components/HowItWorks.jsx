@@ -74,21 +74,7 @@ export default function HowItWorks() {
                 overflow: 'hidden',
               }}
             >
-              {/* Faded bg number */}
-              <span style={{
-                position: 'absolute',
-                top: '-8px',
-                right: '12px',
-                fontFamily: 'Plus Jakarta Sans',
-                fontWeight: 800,
-                fontSize: '80px',
-                color: '#1A1A1A',
-                opacity: 0.12,
-                lineHeight: 1,
-                userSelect: 'none',
-              }}>
-                {s.num}
-              </span>
+              {/* Faded bg number — removed for cleaner design */}
 
               {/* Step badge */}
               <span style={{

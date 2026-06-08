@@ -68,8 +68,8 @@ export default function ForProfessionals() {
               key={i}
               style={{
                 display: 'flex', alignItems: 'center', gap: '16px',
-                background: 'rgba(255,255,255,0.15)',
-                border: '2px solid rgba(255,255,255,0.4)',
+                background: '#FFFFFF',
+                border: '2px solid #1A1A1A',
                 borderRadius: '12px',
                 padding: '16px 20px',
               }}
@@ -82,7 +82,7 @@ export default function ForProfessionals() {
               }}>
                 <span style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '14px', color: '#1A1A1A' }}>✓</span>
               </div>
-              <span style={{ fontFamily: 'Inter', fontSize: '15px', color: '#FFFFFF', lineHeight: 1.5 }}>
+              <span style={{ fontFamily: 'Inter', fontSize: '15px', color: '#1A1A1A', lineHeight: 1.5 }}>
                 {f.text}
               </span>
             </div>

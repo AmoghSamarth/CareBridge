@@ -65,7 +65,7 @@ export default function SocialProof() {
                 overflow: 'hidden',
               }}
             >
-              {/* Decorative quote mark */}
+              {/* Decorative quote mark — pink */}
               <span style={{
                 position: 'absolute',
                 top: '-8px',
@@ -73,17 +73,17 @@ export default function SocialProof() {
                 fontFamily: 'Plus Jakarta Sans',
                 fontWeight: 800,
                 fontSize: '80px',
-                color: '#F5C842',
+                color: '#F03E7A',
                 lineHeight: 1,
                 userSelect: 'none',
               }}>
                 "
               </span>
 
-              {/* Stars */}
+              {/* Stars — pink */}
               <div style={{ display: 'flex', gap: '3px', marginBottom: '16px', marginTop: '24px' }}>
                 {Array.from({ length: t.stars }).map((_, j) => (
-                  <svg key={j} width="16" height="16" viewBox="0 0 24 24" fill="#F5C842" stroke="#1A1A1A" strokeWidth="1">
+                  <svg key={j} width="16" height="16" viewBox="0 0 24 24" fill="#F03E7A" stroke="#1A1A1A" strokeWidth="1">
                     <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
                   </svg>
                 ))}
@@ -97,15 +97,15 @@ export default function SocialProof() {
                 {t.text}
               </p>
 
-              {/* Author */}
+              {/* Author — white avatar, dark text */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <div style={{
                   width: '44px', height: '44px', borderRadius: '50%',
-                  background: t.avatarBg, border: '2px solid #1A1A1A',
+                  background: '#FFFFFF', border: '2px solid #1A1A1A',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   flexShrink: 0,
                 }}>
-                  <span style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '16px', color: '#fff' }}>
+                  <span style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '16px', color: '#1A1A1A' }}>
                     {t.avatarLetter}
                   </span>
                 </div>

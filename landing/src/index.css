@@ -3,16 +3,38 @@
 @tailwind utilities;
 
 /* ── Playful Brutalism Design System ──────────────────────────── */
-:root {
-  --peach:    #FAE8D8;
-  --yellow:   #F5C842;
-  --pink:     #F03E7A;
-  --teal:     #2EC4B6;
+:root, [data-theme="light"] {
+  --bg-page: #FAE8D8;
+  --bg-card: #FFFFFF;
+  --bg-nav: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-muted: #6B6B6B;
+  --border: #1A1A1A;
+  --shadow: #1A1A1A;
+  --yellow: #F5C842;
+  --pink: #F03E7A;
+  --teal: #2EC4B6;
   --lavender: #9B8FE8;
+  /* Legacy vars for compatibility */
+  --peach:    #FAE8D8;
   --coral:    #FF6B35;
   --dark:     #1A1A1A;
   --white:    #FFFFFF;
   --muted:    #6B6B6B;
+}
+
+[data-theme="dark"] {
+  --bg-page: #1A1A1A;
+  --bg-card: #2A2A2A;
+  --bg-nav: #1A1A1A;
+  --text-primary: #FAE8D8;
+  --text-muted: #888780;
+  --border: #FAE8D8;
+  --shadow: #FAE8D8;
+  --yellow: #F5C842;
+  --pink: #F03E7A;
+  --teal: #2EC4B6;
+  --lavender: #9B8FE8;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -35,18 +57,19 @@ html {
 }
 
 body {
-  background-color: #FAE8D8;
-  color: #1A1A1A;
+  background-color: var(--bg-page);
+  color: var(--text-primary);
   font-family: 'Inter', sans-serif;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Plus Jakarta Sans', sans-serif;
   letter-spacing: -0.02em;
-  color: #1A1A1A;
+  color: var(--text-primary);
 }
 
 /* ── Float Keyframes ───────────────────────────────────────────── */
@@ -75,8 +98,8 @@ h1, h2, h3, h4, h5, h6 {
 
 /* ── Scrollbar ─────────────────────────────────────────────────── */
 ::-webkit-scrollbar       { width: 4px; height: 4px; }
-::-webkit-scrollbar-track { background: #FAE8D8; }
-::-webkit-scrollbar-thumb { background: #1A1A1A; border-radius: 2px; }
+::-webkit-scrollbar-track { background: var(--bg-page); }
+::-webkit-scrollbar-thumb { background: var(--text-primary); border-radius: 2px; }
 
 ::selection {
   background: #F5C842;
@@ -92,11 +115,12 @@ h1, h2, h3, h4, h5, h6 {
 
 /* ── Page-wrapper & Content-card ───────────────────────────────── */
 .page-wrapper {
-  background: #FAE8D8;
+  background: var(--bg-page);
   min-height: 100vh;
   padding: 20px;
   position: relative;
   overflow-x: hidden;
+  transition: background-color 0.3s;
 }
 
 .content-card {

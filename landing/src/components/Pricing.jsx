@@ -75,7 +75,7 @@ export default function Pricing() {
             display: 'inline-block',
             fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: '12px',
             letterSpacing: '0.08em', textTransform: 'uppercase',
-            background: '#9B8FE8', color: '#FFFFFF',
+            background: '#F5C842', color: '#1A1A1A',
             border: '2px solid #1A1A1A', borderRadius: '999px',
             padding: '5px 14px', marginBottom: '16px',
           }}>

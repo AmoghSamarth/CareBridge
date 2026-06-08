@@ -1,11 +1,26 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import Logo from './Logo.jsx';
+import { useTheme } from '../context/ThemeContext.jsx';
 
 const SunIcon = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-    <circle cx="12" cy="12" r="4"/>
-    <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <circle cx="12" cy="12" r="5"/>
+    <line x1="12" y1="1" x2="12" y2="3"/>
+    <line x1="12" y1="21" x2="12" y2="23"/>
+    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+    <line x1="1" y1="12" x2="3" y2="12"/>
+    <line x1="21" y1="12" x2="23" y2="12"/>
+    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+  </svg>
+);
+
+const MoonIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
   </svg>
 );
 
@@ -27,6 +42,7 @@ export default function Navbar() {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef(null);
+  const { theme, toggle } = useTheme();
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -49,25 +65,14 @@ export default function Navbar() {
       className="relative z-50 flex items-center justify-between px-6 md:px-10"
       style={{
         height: '68px',
-        background: 'transparent',
-        borderBottom: '2px solid #1A1A1A',
+        background: 'var(--bg-nav)',
+        borderBottom: '2px solid var(--border)',
       }}
     >
       {/* Logo */}
       <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => navigate('/')}>
-        <div
-          className="flex items-center justify-center"
-          style={{
-            width: '28px',
-            height: '28px',
-            background: '#9B8FE8',
-            border: '2px solid #1A1A1A',
-            borderRadius: '8px',
-          }}
-        >
-          <span style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '14px', color: '#fff' }}>C</span>
-        </div>
-        <span style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '22px', color: '#1A1A1A', letterSpacing: '-0.02em' }}>
+        <Logo size="sm" />
+        <span style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '22px', color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
           CareBridge
         </span>
       </div>
@@ -76,37 +81,40 @@ export default function Navbar() {
       <div className="hidden md:flex items-center gap-6">
         <button
           onClick={scrollToHowItWorks}
-          style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 600, fontSize: '15px', color: '#1A1A1A' }}
+          style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 600, fontSize: '15px', color: 'var(--text-primary)' }}
           className="transition-colors cursor-pointer hover:text-pink"
         >
           How it works
         </button>
 
-        {/* Theme toggle — decorative */}
+        {/* Theme toggle */}
         <button
+          onClick={toggle}
           style={{
             width: '36px',
             height: '36px',
-            border: '2px solid #1A1A1A',
+            border: '2px solid var(--border)',
             borderRadius: '8px',
             background: '#F5C842',
-            boxShadow: '2px 2px 0 #1A1A1A',
+            boxShadow: '2px 2px 0 var(--shadow)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             cursor: 'pointer',
             transition: 'transform 0.15s, box-shadow 0.15s',
+            color: 'var(--text-primary)',
           }}
           onMouseEnter={e => {
             e.currentTarget.style.transform = 'translate(-2px,-2px)';
-            e.currentTarget.style.boxShadow = '4px 4px 0 #1A1A1A';
+            e.currentTarget.style.boxShadow = '4px 4px 0 var(--shadow)';
           }}
           onMouseLeave={e => {
             e.currentTarget.style.transform = '';
-            e.currentTarget.style.boxShadow = '2px 2px 0 #1A1A1A';
+            e.currentTarget.style.boxShadow = '2px 2px 0 var(--shadow)';
           }}
+          title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
         >
-          <SunIcon />
+          {theme === 'light' ? <MoonIcon /> : <SunIcon />}
         </button>
 
         {/* Login button */}

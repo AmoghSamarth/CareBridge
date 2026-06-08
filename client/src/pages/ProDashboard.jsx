@@ -1,5 +1,6 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
+import { getLandingUrl } from '../lib/urls';
 import { 
   Sparkles, 
   Calendar, 
@@ -52,7 +53,7 @@ export default function ProDashboard() {
 
   const handleReturnToLanding = () => {
     // Redirect to landing page
-    window.location.href = 'http://localhost:5174';
+    window.location.href = getLandingUrl();
   };
 
   return (

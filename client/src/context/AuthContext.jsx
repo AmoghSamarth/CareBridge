@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { auth, db, isFirebaseInitialized } from '../lib/firebase';
+import { tryAuthHandoff } from '../lib/authHandoff';
+import { getLandingUrl } from '../lib/urls';
 import {
   signOut,
   onAuthStateChanged
@@ -23,51 +25,55 @@ export const AuthProvider = ({ children }) => {
   });
 
   useEffect(() => {
-    if (isFirebaseInitialized && auth) {
-      const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-        if (firebaseUser) {
-          const mapped = mapFirebaseUser(firebaseUser);
-          setUser(mapped);
-          // Read user document from Firestore
-          try {
-            const userRef = doc(db, 'users', firebaseUser.uid);
-            const snap = await getDoc(userRef);
-            if (snap.exists()) {
-              setUserDoc(snap.data());
-            } else {
-              // New user — doc will be created by landing AuthPage
+    let unsubscribe;
+
+    async function setupAuth() {
+      if (isFirebaseInitialized && auth) {
+        await tryAuthHandoff(auth);
+
+        unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+          if (firebaseUser) {
+            const mapped = mapFirebaseUser(firebaseUser);
+            setUser(mapped);
+            try {
+              const userRef = doc(db, 'users', firebaseUser.uid);
+              const snap = await getDoc(userRef);
+              if (snap.exists()) {
+                setUserDoc(snap.data());
+              } else {
+                setUserDoc({ onboarding_complete: false, role: 'customer' });
+              }
+            } catch {
               setUserDoc({ onboarding_complete: false, role: 'customer' });
             }
-          } catch {
-            setUserDoc({ onboarding_complete: false, role: 'customer' });
+          } else {
+            setUser(null);
+            setUserDoc(null);
           }
-        } else {
-          setUser(null);
-          setUserDoc(null);
+          setLoading(false);
+        });
+      } else {
+        const savedUser = localStorage.getItem('carebridge_mock_user');
+        if (savedUser) {
+          try {
+            const parsed = JSON.parse(savedUser);
+            setUser(parsed);
+            const onb = localStorage.getItem(`carebridge_onboarding_${parsed.uid}`);
+            setUserDoc({
+              onboarding_complete: onb === 'true',
+              role: parsed.role || 'customer',
+            });
+          } catch {
+            setUser(null);
+            setUserDoc(null);
+          }
         }
         setLoading(false);
-      });
-      return unsubscribe;
-    } else {
-      // Mock mode: check localStorage
-      const savedUser = localStorage.getItem('carebridge_mock_user');
-      if (savedUser) {
-        try {
-          const parsed = JSON.parse(savedUser);
-          setUser(parsed);
-          // Check mock onboarding state
-          const onb = localStorage.getItem(`carebridge_onboarding_${parsed.uid}`);
-          setUserDoc({
-            onboarding_complete: onb === 'true',
-            role: parsed.role || 'customer'
-          });
-        } catch {
-          setUser(null);
-          setUserDoc(null);
-        }
       }
-      setLoading(false);
     }
+
+    setupAuth();
+    return () => unsubscribe?.();
   }, []);
 
   const logout = async () => {
@@ -89,8 +95,7 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     }
     // Always redirect to landing on logout
-    const landingUrl = import.meta.env.VITE_LANDING_URL || 'http://localhost:5174';
-    window.location.href = landingUrl;
+    window.location.href = getLandingUrl();
   };
 
   // Called by WingmanContext after onboarding completes

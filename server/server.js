@@ -27,11 +27,13 @@ import wingmanRoutes from './routes/wingman.js';
 import professionalsRoutes from './routes/professionals.js';
 import bookingsRoutes from './routes/bookings.js';
 import searchRoutes from './routes/search.js';
+import authRoutes from './routes/auth.js';
 
 app.use('/api/wingman', wingmanRoutes);
 app.use('/api/professionals', professionalsRoutes);
 app.use('/api/bookings', bookingsRoutes);
 app.use('/api/search', searchRoutes);
+app.use('/api/auth', authRoutes);
 
 // Error Handling Middleware
 app.use(errorHandler);

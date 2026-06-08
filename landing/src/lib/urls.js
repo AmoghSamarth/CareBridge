@@ -1,6 +1,14 @@
 const LOCAL_CLIENT_URL = 'http://localhost:5173';
 const DEFAULT_PROD_CLIENT_URL = 'https://care-bridge-hp9u.vercel.app';
 
+/** After sign-in on landing, send the user to the client app with a short-lived ID token. */
+export async function redirectToClientAfterAuth(user) {
+  const idToken = await user.getIdToken();
+  const url = new URL(getClientUrl());
+  url.searchParams.set('auth', idToken);
+  window.location.href = url.toString();
+}
+
 function isLocalHost() {
   if (typeof window === 'undefined') return false;
   const host = window.location.hostname;

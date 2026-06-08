@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useWingman } from '../context/WingmanContext';
 import { db, isFirebaseInitialized, auth } from '../lib/firebase';
+import { getLandingUrl } from '../lib/urls';
 import { 
   doc, 
   getDoc, 
@@ -326,7 +327,7 @@ export default function Profile() {
 
   const handleSignOut = async () => {
     await logout();
-    window.location.href = 'http://localhost:5174';
+    window.location.href = getLandingUrl();
   };
 
   const handleDeleteAccount = async () => {
@@ -347,7 +348,7 @@ export default function Profile() {
     }
 
     await logout();
-    window.location.href = 'http://localhost:5174';
+    window.location.href = getLandingUrl();
   };
 
   const renderStars = (score) => {

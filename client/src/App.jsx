@@ -1,6 +1,7 @@
 import React, { useState, Suspense, lazy } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { getLandingUrl } from './lib/urls';
 import { WingmanProvider } from './context/WingmanContext';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
@@ -31,7 +32,7 @@ function AppContent() {
   if (window.location.pathname === '/pro-dashboard') return <ProDashboard />;
 
   if (!user) {
-    window.location.href = import.meta.env.VITE_LANDING_URL || 'http://localhost:5174';
+    window.location.href = getLandingUrl();
     return (
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#FAE8D8' }}>
         <p style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: '14px', color: '#6B6B6B' }}>

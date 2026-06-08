@@ -23,7 +23,7 @@ import {
   sendPasswordResetEmail,
 } from '../lib/firebase.js';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
-import { getClientUrl } from '../lib/urls.js';
+import { redirectToClientAfterAuth } from '../lib/urls.js';
 
 const GoogleIcon = () => (
   <svg width="20" height="20" viewBox="0 0 24 24">
@@ -99,8 +99,7 @@ export default function AuthPage() {
         });
       }
 
-      // Redirect to client app
-      window.location.href = getClientUrl();
+      await redirectToClientAfterAuth(user);
     } catch (err) {
       console.error('Email sign-in error:', err);
       
@@ -150,8 +149,7 @@ export default function AuthPage() {
         });
       }
 
-      // Redirect to client app
-      window.location.href = getClientUrl();
+      await redirectToClientAfterAuth(user);
     } catch (err) {
       console.error('Sign-in error:', err);
       if (err.code === 'auth/popup-closed-by-user') {

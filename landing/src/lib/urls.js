@@ -33,13 +33,18 @@ export function getClientUrl() {
   const envUrl = import.meta.env.VITE_CLIENT_URL?.trim();
   const onLocalDev = isLocalHost();
 
+  console.log('📍 getClientUrl() - onLocalDev:', onLocalDev, 'envUrl:', envUrl);
+
   if (onLocalDev) {
     return envUrl || LOCAL_CLIENT_URL;
   }
 
+  // On production: use env var if available and valid, otherwise use default
   if (envUrl && !isLocalUrl(envUrl)) {
+    console.log('✓ Using VITE_CLIENT_URL from env');
     return envUrl;
   }
 
+  console.log('⚠️ VITE_CLIENT_URL not set, using default:', DEFAULT_PROD_CLIENT_URL);
   return DEFAULT_PROD_CLIENT_URL;
 }

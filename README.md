@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # CareBridge
 
 > "When life gets busy, care comes to you."
@@ -91,3 +92,6 @@ node seed/seedProfessionals.js
 - **Database**: Firebase Firestore (with local `salons.json` fallback)
 - **Auth**: Firebase Auth (Google Sign-In)
 - **Images**: Unsplash API
+=======
+# CareBridge
+>>>>>>> a7d7245fb3b181c188b9fecea3aa7d18927b88e4

@@ -1,5 +1,10 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import {
+  getAuth, signInWithPopup, GoogleAuthProvider,
+  signInWithEmailAndPassword, createUserWithEmailAndPassword,
+  sendPasswordResetEmail, signOut, onAuthStateChanged,
+  signInWithCredential
+} from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
@@ -11,23 +16,14 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
-let app;
-let auth;
-let db;
-let isFirebaseInitialized = false;
+const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
+export const db = getFirestore(app);
+export const isFirebaseInitialized = true;
 
-// Check if variables exist before initializing
-if (firebaseConfig.apiKey && firebaseConfig.apiKey !== 'your_firebase_web_api_key_here') {
-  try {
-    app = initializeApp(firebaseConfig);
-    auth = getAuth(app);
-    db = getFirestore(app);
-    isFirebaseInitialized = true;
-  } catch (error) {
-    console.error('❌ Client Firebase initialization failed:', error);
-  }
-} else {
-  console.warn('⚠️ Firebase environment variables are missing or default. Auth and database will run in Mock Mode on the client.');
-}
-
-export { auth, db, isFirebaseInitialized };
+export {
+  signInWithPopup, GoogleAuthProvider,
+  signInWithEmailAndPassword, createUserWithEmailAndPassword,
+  sendPasswordResetEmail, signOut, onAuthStateChanged,
+  signInWithCredential
+};

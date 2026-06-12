@@ -1,8 +1,23 @@
-@config "../../tailwind.config.js";
+@import "tailwindcss";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@theme {
+  --color-peach: #FAE8D8;
+  --color-yellow: #F5C842;
+  --color-pink: #F03E7A;
+  --color-teal: #2EC4B6;
+  --color-lavender: #9B8FE8;
+  --color-coral: #FF6B35;
+  --color-dark: #1A1A1A;
+  --color-white: #FFFFFF;
+  --color-muted: #6B6B6B;
+
+  --font-sans: 'Inter', sans-serif;
+  --font-display: 'Plus Jakarta Sans', sans-serif;
+
+  --shadow-brutal: 5px 5px 0px #1A1A1A;
+  --shadow-brutal-sm: 3px 3px 0px #1A1A1A;
+  --shadow-brutal-lg: 8px 8px 0px #1A1A1A;
+}
 
 /* ── Playful Brutalism Design System (Client) ─────────────────── */
 :root, [data-theme="light"] {

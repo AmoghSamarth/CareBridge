@@ -145,3 +145,40 @@ h1, h2, h3, h4, h5, h6 {
   position: relative;
   overflow-x: hidden;
 }
+
+@layer utilities {
+  .bg-peach    { background-color: #FAE8D8; }
+  .bg-yellow   { background-color: #F5C842; }
+  .bg-pink     { background-color: #F03E7A; }
+  .bg-teal     { background-color: #2EC4B6; }
+  .bg-lavender { background-color: #9B8FE8; }
+  .bg-coral    { background-color: #FF6B35; }
+  .bg-dark     { background-color: #1A1A1A; }
+  .bg-cream    { background-color: #FFF8F0; }
+
+  .text-dark   { color: #1A1A1A; }
+  .text-muted  { color: #6B6B6B; }
+  .text-yellow { color: #F5C842; }
+  .text-pink   { color: #F03E7A; }
+  .text-teal   { color: #2EC4B6; }
+  .text-coral  { color: #FF6B35; }
+
+  .border-dark { border-color: #1A1A1A; }
+  .border-3    { border-width: 3px; }
+  .border-r-3  { border-right-width: 3px; }
+
+  .font-display { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+  .shadow-brutal       { box-shadow: 5px 5px 0px #1A1A1A; }
+  .shadow-brutal-sm    { box-shadow: 3px 3px 0px #1A1A1A; }
+  .shadow-brutal-lg    { box-shadow: 8px 8px 0px #1A1A1A; }
+  .shadow-brutal-xl    { box-shadow: 10px 10px 0px #1A1A1A; }
+  .shadow-brutal-hover { box-shadow: 7px 7px 0px #1A1A1A; }
+  .shadow-brutal-yellow { box-shadow: 5px 5px 0px #F5C842; }
+  .shadow-brutal-pink  { box-shadow: 5px 5px 0px #F03E7A; }
+
+  .animate-float        { animation: float 5s ease-in-out infinite; }
+  .animate-float-slow   { animation: float 7s ease-in-out infinite; }
+  .animate-float-rotate { animation: float-rotate 5s ease-in-out infinite; }
+  .animate-blink        { animation: blink 1.2s step-end infinite; }
+}

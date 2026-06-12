@@ -3,26 +3,46 @@ import { ShieldAlert, ArrowRight } from 'lucide-react';
 
 export default function EmergencyBanner({ onTriggerEmergency }) {
   return (
-    <div className="w-full bg-coral border-3 border-dark p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-brutal relative overflow-hidden rounded-none">
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 border-2 border-dark bg-white flex items-center justify-center shrink-0 rounded-none">
-          <ShieldAlert className="w-5 h-5 text-dark animate-pulse" strokeWidth={2.5} />
+    <div style={{
+      width: '100%', background: '#FF6B35',
+      border: '2.5px solid #1A1A1A', boxShadow: '5px 5px 0 #1A1A1A',
+      padding: '14px 20px', marginBottom: '24px',
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      gap: '16px', flexWrap: 'wrap',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{
+          width: '36px', height: '36px', background: '#fff',
+          border: '2px solid #1A1A1A', display: 'flex',
+          alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+          boxShadow: '2px 2px 0 #1A1A1A',
+        }}>
+          <ShieldAlert size={18} strokeWidth={2.5} color="#1A1A1A" />
         </div>
-        <div className="text-center sm:text-left text-dark">
-          <h4 className="font-display font-extrabold text-sm">NEED AN EMERGENCY TRIM?</h4>
-          <p className="text-[11px] font-sans font-bold leading-relaxed mt-0.5 text-dark/90">
-            Unexpected interview or event? Get prioritized booking slots with providers near you in Nagpur.
+        <div>
+          <h4 style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '13px', color: '#1A1A1A', margin: '0 0 2px', letterSpacing: '0.04em' }}>
+            NEED AN EMERGENCY TRIM?
+          </h4>
+          <p style={{ fontFamily: 'Inter', fontSize: '11px', fontWeight: 600, color: '#1A1A1A', opacity: 0.85, margin: 0, lineHeight: 1.4 }}>
+            Unexpected interview or event? Get prioritized slots near you in Nagpur.
           </p>
         </div>
       </div>
 
-      <button
-        type="button"
-        onClick={onTriggerEmergency}
-        className="flex items-center gap-1.5 bg-yellow border-3 border-dark text-dark font-display font-bold text-xs py-2.5 px-4 shadow-[3px_3px_0px_#1A1A1A] hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-[5px_5px_0px_#1A1A1A] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all duration-150 shrink-0 cursor-pointer rounded-none uppercase"
+      <button onClick={onTriggerEmergency}
+        style={{
+          display: 'flex', alignItems: 'center', gap: '6px',
+          background: '#F5C842', border: '2.5px solid #1A1A1A',
+          color: '#1A1A1A', padding: '10px 18px',
+          fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '11px',
+          letterSpacing: '0.06em', textTransform: 'uppercase',
+          cursor: 'pointer', boxShadow: '3px 3px 0 #1A1A1A',
+          transition: 'transform 0.12s, box-shadow 0.12s', flexShrink: 0,
+        }}
+        onMouseEnter={e => { e.currentTarget.style.transform = 'translate(-2px,-2px)'; e.currentTarget.style.boxShadow = '5px 5px 0 #1A1A1A'; }}
+        onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '3px 3px 0 #1A1A1A'; }}
       >
-        <span>REQUEST NOW</span>
-        <ArrowRight className="w-3.5 h-3.5" strokeWidth={2.5} />
+        REQUEST NOW <ArrowRight size={13} strokeWidth={2.5} />
       </button>
     </div>
   );

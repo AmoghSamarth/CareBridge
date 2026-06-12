@@ -109,7 +109,7 @@ export default function Home({ setActiveTab }) {
             display: 'flex', alignItems: 'center', gap: '6px',
             fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: '11px',
             background: '#fff', border: '2px solid #1A1A1A', color: '#1A1A1A',
-            padding: '8px 14px', boxShadow: '3px 3px 0 #1A1A1A', cursor: 'pointer',
+            padding: '8px 14px', boxShadow: '3px 3px 0 var(--shadow)', cursor: 'pointer',
             letterSpacing: '0.06em', transition: 'transform 0.12s, box-shadow 0.12s'
           }}
             onMouseEnter={e => { e.currentTarget.style.transform = 'translate(-2px,-2px)'; e.currentTarget.style.boxShadow = '5px 5px 0 #1A1A1A'; }}

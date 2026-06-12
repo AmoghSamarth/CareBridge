@@ -2,26 +2,54 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useWingman } from '../context/WingmanContext';
 import { useAuth } from '../context/AuthContext';
-import { Sparkles, Calendar, ArrowRight, ArrowLeft, Send } from 'lucide-react';
+import { Sparkles, ArrowRight, ArrowLeft, Send, Calendar } from 'lucide-react';
+
+const STEPS = [
+  {
+    id: 1, key: 'hairType',
+    q: 'What is your\nhair type?',
+    sub: 'Select the choice that matches your natural hair structure.',
+    options: ['Straight', 'Wavy', 'Curly', 'Coily'],
+    emoji: ['🧑', '🌊', '🌀', '✨'],
+  },
+  {
+    id: 2, key: 'groomFrequency',
+    q: 'How often do\nyou groom?',
+    sub: 'Wingman calculates when your next trim is due.',
+    options: ['Weekly', 'Bi-weekly', 'Monthly', 'Rarely'],
+    emoji: ['⚡', '🗓️', '📅', '😴'],
+  },
+  {
+    id: 4, key: 'priority',
+    q: 'What matters\nmost to you?',
+    sub: 'Choose the style goal that defines your look.',
+    options: ['Confidence', 'Routine', 'First Impressions', 'Looking Fresh'],
+    emoji: ['💪', '🔁', '👀', '✨'],
+  },
+  {
+    id: 5, key: 'budgetRange',
+    q: 'What is your\nbudget range?',
+    sub: 'We filter Nagpur professionals in this price tier.',
+    options: ['100-300', '300-600', '600-1200', '1200+'],
+    emoji: ['💸', '💵', '💰', '👑'],
+    prefix: '₹',
+    format: (v) => '₹' + v.replace('-', '–'),
+  },
+];
+
+const EVENT_TYPES = ['Interview', 'Wedding', 'Date Night', 'Festival', 'Party', 'Other'];
+const EVENT_EMOJI = { Interview: '💼', Wedding: '💒', 'Date Night': '💖', Festival: '🎆', Party: '🎉', Other: '📅' };
 
 export default function WingmanChat() {
   const { user } = useAuth();
   const {
-    onboardingComplete,
-    onboardingStep,
-    onboardingData,
-    messages,
-    isTyping,
-    setOnboardingStep,
-    updateOnboardingData,
-    completeOnboarding,
-    sendUserMessage
+    onboardingComplete, onboardingStep, onboardingData, messages, isTyping,
+    setOnboardingStep, updateOnboardingData, completeOnboarding, sendUserMessage
   } = useWingman();
 
   const [inputVal, setInputVal] = useState('');
   const messagesEndRef = useRef(null);
 
-  // Auto-scroll to bottom of chat
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
@@ -32,335 +60,274 @@ export default function WingmanChat() {
     setInputVal('');
   };
 
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') handleSend();
+  // Map onboardingStep (1-5) to our STEPS array index
+  // Step 3 is the event step (special UI)
+  const isEventStep = onboardingStep === 3;
+  const currentStepData = STEPS.find(s => s.id === onboardingStep);
+
+  const canProceed = () => {
+    if (onboardingStep === 1) return !!onboardingData.hairType;
+    if (onboardingStep === 2) return !!onboardingData.groomFrequency;
+    if (onboardingStep === 3) return !!onboardingData.upcomingEvent?.eventType;
+    if (onboardingStep === 4) return !!onboardingData.priority;
+    if (onboardingStep === 5) return !!onboardingData.budgetRange;
+    return false;
   };
 
-  const nextStep = () => setOnboardingStep(onboardingStep + 1);
-  const prevStep = () => setOnboardingStep(onboardingStep - 1);
+  const getValue = (step) => {
+    if (step === 1) return onboardingData.hairType;
+    if (step === 2) return onboardingData.groomFrequency;
+    if (step === 4) return onboardingData.priority;
+    if (step === 5) return onboardingData.budgetRange;
+    return null;
+  };
+
+  const setValue = (step, val) => {
+    if (step === 1) updateOnboardingData('hairType', val);
+    if (step === 2) updateOnboardingData('groomFrequency', val);
+    if (step === 4) updateOnboardingData('priority', val);
+    if (step === 5) updateOnboardingData('budgetRange', val);
+  };
 
   if (!onboardingComplete) {
     return (
-      <div className="w-full max-w-lg mx-auto bg-white border-3 border-dark p-6 sm:p-8 shadow-brutal rounded-none relative">
-        {/* Step indicator */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-dark" strokeWidth={2.5} />
-            <span className="font-display font-extrabold text-sm tracking-widest text-dark uppercase">WINGMAN SETUP</span>
+      <div style={{
+        width: '100%', maxWidth: '560px', margin: '0 auto',
+        background: '#fff', border: '3px solid #1A1A1A',
+        boxShadow: '8px 8px 0 #1A1A1A',
+      }}>
+        {/* Top bar */}
+        <div style={{
+          background: '#1A1A1A', padding: '14px 24px',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Sparkles size={16} strokeWidth={2.5} color="#F5C842" />
+            <span style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '12px', color: '#F5C842', letterSpacing: '0.1em' }}>
+              WINGMAN SETUP
+            </span>
           </div>
-          <span className="text-xs font-display font-bold text-muted uppercase">Step {onboardingStep} of 5</span>
+          <div style={{ display: 'flex', gap: '6px' }}>
+            {[1,2,3,4,5].map(i => (
+              <div key={i} style={{
+                width: i <= onboardingStep ? '24px' : '8px', height: '8px',
+                background: i <= onboardingStep ? '#F5C842' : '#333',
+                borderRadius: '4px', transition: 'all 0.3s ease',
+              }} />
+            ))}
+          </div>
+          <span style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: '11px', color: '#666', letterSpacing: '0.06em' }}>
+            {onboardingStep} / 5
+          </span>
         </div>
 
-        {/* Onboarding screens container */}
-        <div className="min-h-[280px] flex flex-col justify-between">
+        {/* Content */}
+        <div style={{ padding: '32px 28px 24px' }}>
           <AnimatePresence mode="wait">
-            {onboardingStep === 1 && (
-              <motion.div
-                key="step1"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.2 }}
-                className="flex-1"
-              >
-                <h2 className="font-display font-extrabold text-2xl mb-2 text-dark">WHAT IS YOUR HAIR TYPE?</h2>
-                <p className="text-xs font-sans font-bold text-muted mb-6 uppercase">Select the choice that matches your natural hair structure.</p>
-                <div className="grid grid-cols-2 gap-4">
-                  {['Straight', 'Wavy', 'Curly', 'Coily'].map((type) => {
-                    const isSelected = onboardingData.hairType === type;
-                    return (
-                      <button
-                        key={type}
-                        type="button"
-                        onClick={() => updateOnboardingData('hairType', type)}
-                        className={`py-4 px-6 border-3 border-dark font-display font-bold text-sm transition-all duration-150 rounded-none cursor-pointer ${
-                          isSelected
-                            ? 'bg-yellow text-dark shadow-[4px_4px_0px_#1A1A1A] translate-x-[-2px] translate-y-[-2px]'
-                            : 'bg-white text-dark shadow-[2px_2px_0px_#1A1A1A] hover:bg-cream hover:shadow-[4px_4px_0px_#1A1A1A] hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 active:shadow-none'
-                        }`}
-                      >
-                        {type.toUpperCase()}
-                      </button>
-                    );
-                  })}
-                </div>
-              </motion.div>
-            )}
+            <motion.div
+              key={onboardingStep}
+              initial={{ opacity: 0, x: 24 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -24 }}
+              transition={{ duration: 0.22 }}
+            >
+              {/* Question */}
+              {!isEventStep && currentStepData && (
+                <>
+                  <h2 style={{
+                    fontFamily: 'Plus Jakarta Sans', fontWeight: 800,
+                    fontSize: 'clamp(22px, 4vw, 30px)', color: '#1A1A1A',
+                    lineHeight: 1.2, marginBottom: '8px', whiteSpace: 'pre-line',
+                    letterSpacing: '-0.02em',
+                  }}>
+                    {currentStepData.q}
+                  </h2>
+                  <p style={{ fontFamily: 'Inter', fontSize: '12px', color: '#6B6B6B', fontWeight: 600, marginBottom: '28px', lineHeight: 1.5 }}>
+                    {currentStepData.sub}
+                  </p>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                    {currentStepData.options.map((opt, i) => {
+                      const selected = getValue(onboardingStep) === opt;
+                      return (
+                        <button key={opt} onClick={() => setValue(onboardingStep, opt)}
+                          style={{
+                            padding: '18px 12px', border: '2.5px solid #1A1A1A',
+                            background: selected ? '#F5C842' : '#fff',
+                            boxShadow: selected ? '4px 4px 0 #1A1A1A' : '3px 3px 0 #1A1A1A',
+                            transform: selected ? 'translate(-2px,-2px)' : '',
+                            cursor: 'pointer', transition: 'all 0.12s',
+                            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px',
+                          }}
+                          onMouseEnter={e => { if (!selected) { e.currentTarget.style.transform='translate(-1px,-1px)'; e.currentTarget.style.background='#FFF8F0'; }}}
+                          onMouseLeave={e => { if (!selected) { e.currentTarget.style.transform=''; e.currentTarget.style.background='#fff'; }}}
+                        >
+                          <span style={{ fontSize: '24px', lineHeight: 1 }}>{currentStepData.emoji[i]}</span>
+                          <span style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '12px', color: '#1A1A1A', textTransform: 'uppercase', letterSpacing: '0.06em', textAlign: 'center' }}>
+                            {currentStepData.format ? currentStepData.format(opt) : opt}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
 
-            {onboardingStep === 2 && (
-              <motion.div
-                key="step2"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.2 }}
-                className="flex-1"
-              >
-                <h2 className="font-display font-extrabold text-2xl mb-2 text-dark">HOW OFTEN DO YOU GROOM?</h2>
-                <p className="text-xs font-sans font-bold text-muted mb-6 uppercase">This helps Wingman calculate when your next trim is due.</p>
-                <div className="grid grid-cols-2 gap-4">
-                  {['Weekly', 'Bi-weekly', 'Monthly', 'Rarely'].map((freq) => {
-                    const isSelected = onboardingData.groomFrequency === freq;
-                    return (
-                      <button
-                        key={freq}
-                        type="button"
-                        onClick={() => updateOnboardingData('groomFrequency', freq)}
-                        className={`py-4 px-6 border-3 border-dark font-display font-bold text-sm transition-all duration-150 rounded-none cursor-pointer ${
-                          isSelected
-                            ? 'bg-yellow text-dark shadow-[4px_4px_0px_#1A1A1A] translate-x-[-2px] translate-y-[-2px]'
-                            : 'bg-white text-dark shadow-[2px_2px_0px_#1A1A1A] hover:bg-cream hover:shadow-[4px_4px_0px_#1A1A1A] hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 active:shadow-none'
-                        }`}
-                      >
-                        {freq.toUpperCase()}
-                      </button>
-                    );
-                  })}
-                </div>
-              </motion.div>
-            )}
+              {/* Event step */}
+              {isEventStep && (
+                <>
+                  <h2 style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: 'clamp(22px, 4vw, 30px)', color: '#1A1A1A', lineHeight: 1.2, marginBottom: '8px', letterSpacing: '-0.02em' }}>
+                    Any upcoming{'\n'}events?
+                  </h2>
+                  <p style={{ fontFamily: 'Inter', fontSize: '12px', color: '#6B6B6B', fontWeight: 600, marginBottom: '24px' }}>
+                    Wingman will make sure you look your absolute best.
+                  </p>
 
-            {onboardingStep === 3 && (
-              <motion.div
-                key="step3"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.2 }}
-                className="flex-1 space-y-4"
-              >
-                <div>
-                  <h2 className="font-display font-extrabold text-2xl mb-2 text-dark">ANY UPCOMING EVENTS?</h2>
-                  <p className="text-xs font-sans font-bold text-muted mb-6 uppercase">Wingman will ensure you look absolute best for the big day.</p>
-                </div>
-                
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-[10px] font-display font-bold text-dark uppercase tracking-wider mb-2">EVENT TYPE</label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {['Interview', 'Wedding', 'Date Night', 'Festival', 'Party', 'Other'].map((evt) => {
-                        const isSelected = onboardingData.upcomingEvent.eventType === evt;
-                        return (
-                          <button
-                            key={evt}
-                            type="button"
-                            onClick={() => updateOnboardingData('upcomingEvent', { ...onboardingData.upcomingEvent, eventType: evt })}
-                            className={`py-2 px-1 border-2 border-dark font-display font-bold text-[10px] transition-all rounded-none truncate cursor-pointer ${
-                              isSelected
-                                ? 'bg-yellow text-dark shadow-[2px_2px_0px_#1A1A1A]'
-                                : 'bg-white text-dark hover:bg-cream hover:shadow-[2px_2px_0px_#1A1A1A]'
-                            }`}
-                          >
-                            {evt.toUpperCase()}
-                          </button>
-                        );
-                      })}
-                    </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginBottom: '20px' }}>
+                    {EVENT_TYPES.map(evt => {
+                      const sel = onboardingData.upcomingEvent?.eventType === evt;
+                      return (
+                        <button key={evt} onClick={() => updateOnboardingData('upcomingEvent', { ...onboardingData.upcomingEvent, eventType: evt })}
+                          style={{
+                            padding: '14px 8px', border: '2px solid #1A1A1A',
+                            background: sel ? '#F5C842' : '#fff',
+                            boxShadow: sel ? '3px 3px 0 #1A1A1A' : '2px 2px 0 #1A1A1A',
+                            transform: sel ? 'translate(-1px,-1px)' : '',
+                            cursor: 'pointer', transition: 'all 0.12s',
+                            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px',
+                          }}>
+                          <span style={{ fontSize: '20px' }}>{EVENT_EMOJI[evt]}</span>
+                          <span style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: '10px', color: '#1A1A1A', textTransform: 'uppercase', letterSpacing: '0.04em', textAlign: 'center' }}>{evt}</span>
+                        </button>
+                      );
+                    })}
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-display font-bold text-dark uppercase tracking-wider mb-2">EVENT DATE</label>
-                    <input
-                      type="date"
-                      value={onboardingData.upcomingEvent.eventDate}
-                      onChange={(e) => updateOnboardingData('upcomingEvent', { ...onboardingData.upcomingEvent, eventDate: e.target.value })}
-                      className="w-full bg-white border-3 border-dark text-dark rounded-none py-3 px-4 text-sm focus:outline-none focus:shadow-[4px_4px_0px_#1A1A1A] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all font-sans [color-scheme:light]"
+                    <p style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: '10px', color: '#6B6B6B', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>
+                      <Calendar size={11} style={{ display: 'inline', marginRight: '4px' }} /> Event Date (optional)
+                    </p>
+                    <input type="date"
+                      value={onboardingData.upcomingEvent?.eventDate || ''}
+                      onChange={e => updateOnboardingData('upcomingEvent', { ...onboardingData.upcomingEvent, eventDate: e.target.value })}
+                      style={{ width: '100%', boxSizing: 'border-box', background: '#fff', border: '2.5px solid #1A1A1A', padding: '12px 14px', fontFamily: 'Plus Jakarta Sans', fontWeight: 600, fontSize: '13px', outline: 'none', colorScheme: 'light' }}
                     />
                   </div>
-                </div>
-              </motion.div>
-            )}
-
-            {onboardingStep === 4 && (
-              <motion.div
-                key="step4"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.2 }}
-                className="flex-1"
-              >
-                <h2 className="font-display font-extrabold text-2xl mb-2 text-dark">WHAT MATTERS MOST?</h2>
-                <p className="text-xs font-sans font-bold text-muted mb-6 uppercase">Choose the style goal that defines your aesthetic.</p>
-                <div className="grid grid-cols-2 gap-4">
-                  {[
-                    { key: 'Confidence', label: 'CONFIDENCE BOOST' },
-                    { key: 'Routine', label: 'CLEAN ROUTINE' },
-                    { key: 'First Impressions', label: 'FIRST IMPRESSIONS' },
-                    { key: 'Looking Fresh', label: 'LOOKING FRESH' }
-                  ].map((item) => {
-                    const isSelected = onboardingData.priority === item.key;
-                    return (
-                      <button
-                        key={item.key}
-                        type="button"
-                        onClick={() => updateOnboardingData('priority', item.key)}
-                        className={`py-4 px-4 border-3 border-dark font-display font-bold text-xs text-center transition-all duration-150 rounded-none cursor-pointer leading-normal ${
-                          isSelected
-                            ? 'bg-yellow text-dark shadow-[4px_4px_0px_#1A1A1A] translate-x-[-2px] translate-y-[-2px]'
-                            : 'bg-white text-dark shadow-[2px_2px_0px_#1A1A1A] hover:bg-cream hover:shadow-[4px_4px_0px_#1A1A1A] hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 active:shadow-none'
-                        }`}
-                      >
-                        {item.label}
-                      </button>
-                    );
-                  })}
-                </div>
-              </motion.div>
-            )}
-
-            {onboardingStep === 5 && (
-              <motion.div
-                key="step5"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.2 }}
-                className="flex-1"
-              >
-                <h2 className="font-display font-extrabold text-2xl mb-2 text-dark">WHAT IS YOUR BUDGET RANGE?</h2>
-                <p className="text-xs font-sans font-bold text-muted mb-6 uppercase">We'll filter Nagpur service providers in this price tier.</p>
-                <div className="grid grid-cols-2 gap-4">
-                  {['100-300', '300-600', '600-1200', '1200+'].map((range) => {
-                    const isSelected = onboardingData.budgetRange === range;
-                    return (
-                      <button
-                        key={range}
-                        type="button"
-                        onClick={() => updateOnboardingData('budgetRange', range)}
-                        className={`py-4 px-6 border-3 border-dark font-display font-bold text-sm transition-all duration-150 rounded-none cursor-pointer ${
-                          isSelected
-                            ? 'bg-yellow text-dark shadow-[4px_4px_0px_#1A1A1A] translate-x-[-2px] translate-y-[-2px]'
-                            : 'bg-white text-dark shadow-[2px_2px_0px_#1A1A1A] hover:bg-cream hover:shadow-[4px_4px_0px_#1A1A1A] hover:translate-x-[-2px] hover:translate-y-[-2px] active:translate-x-0 active:translate-y-0 active:shadow-none'
-                        }`}
-                      >
-                        ₹{range.replace('-', '–')}
-                      </button>
-                    );
-                  })}
-                </div>
-              </motion.div>
-            )}
+                </>
+              )}
+            </motion.div>
           </AnimatePresence>
+        </div>
 
-          {/* Navigation Controls */}
-          <div className="flex items-center justify-between mt-8 pt-4 border-t-3 border-dark">
-            {onboardingStep > 1 ? (
-              <button
-                type="button"
-                onClick={prevStep}
-                className="flex items-center gap-1.5 font-display font-bold text-xs text-muted hover:text-dark transition-colors py-2 cursor-pointer"
-              >
-                <ArrowLeft className="w-3.5 h-3.5" /> BACK
-              </button>
-            ) : (
-              <div />
-            )}
+        {/* Footer nav */}
+        <div style={{ padding: '16px 28px 24px', borderTop: '2.5px solid #1A1A1A', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#FAFAFA' }}>
+          {onboardingStep > 1 ? (
+            <button onClick={() => setOnboardingStep(onboardingStep - 1)}
+              style={{ display: 'flex', alignItems: 'center', gap: '6px', background: 'none', border: 'none', color: '#6B6B6B', fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: '12px', cursor: 'pointer', padding: '8px 0' }}>
+              <ArrowLeft size={14} strokeWidth={2.5} /> BACK
+            </button>
+          ) : <div />}
 
-            {onboardingStep < 5 ? (
-              <button
-                type="button"
-                onClick={nextStep}
-                disabled={
-                  (onboardingStep === 1 && !onboardingData.hairType) ||
-                  (onboardingStep === 2 && !onboardingData.groomFrequency) ||
-                  (onboardingStep === 3 && !onboardingData.upcomingEvent.eventType) ||
-                  (onboardingStep === 4 && !onboardingData.priority)
-                }
-                className="flex items-center gap-1.5 font-display font-bold text-xs py-2.5 px-5 border-3 border-dark bg-yellow text-dark shadow-[3px_3px_0px_#1A1A1A] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_#1A1A1A] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all rounded-none cursor-pointer disabled:opacity-30 disabled:pointer-events-none"
-              >
-                NEXT <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={completeOnboarding}
-                disabled={!onboardingData.budgetRange}
-                className="flex items-center gap-2 font-display font-extrabold text-xs py-2.5 px-6 border-3 border-dark bg-teal text-dark shadow-[4px_4px_0px_#1A1A1A] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[6px_6px_0px_#1A1A1A] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all rounded-none cursor-pointer disabled:opacity-30 disabled:pointer-events-none"
-              >
-                MEET WINGMAN <Sparkles className="w-3.5 h-3.5" />
-              </button>
-            )}
-          </div>
+          {onboardingStep < 5 ? (
+            <button onClick={() => setOnboardingStep(onboardingStep + 1)}
+              disabled={!canProceed()}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '8px',
+                background: canProceed() ? '#F5C842' : '#eee',
+                border: '2.5px solid #1A1A1A', color: '#1A1A1A',
+                padding: '12px 24px', fontFamily: 'Plus Jakarta Sans', fontWeight: 800,
+                fontSize: '12px', letterSpacing: '0.06em', cursor: canProceed() ? 'pointer' : 'not-allowed',
+                boxShadow: canProceed() ? '4px 4px 0 #1A1A1A' : 'none',
+                transition: 'all 0.12s', opacity: canProceed() ? 1 : 0.4,
+              }}>
+              NEXT <ArrowRight size={14} strokeWidth={2.5} />
+            </button>
+          ) : (
+            <button onClick={completeOnboarding}
+              disabled={!onboardingData.budgetRange}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '8px',
+                background: '#2EC4B6', border: '2.5px solid #1A1A1A', color: '#1A1A1A',
+                padding: '12px 24px', fontFamily: 'Plus Jakarta Sans', fontWeight: 800,
+                fontSize: '12px', letterSpacing: '0.06em', cursor: 'pointer',
+                boxShadow: '4px 4px 0 #1A1A1A', transition: 'all 0.12s',
+                opacity: onboardingData.budgetRange ? 1 : 0.4,
+              }}>
+              MEET WINGMAN <Sparkles size={14} strokeWidth={2.5} />
+            </button>
+          )}
         </div>
       </div>
     );
   }
 
-  // Conversational view
+  // Chat view (post-onboarding)
   return (
-    <div className="w-full max-w-2xl mx-auto flex flex-col h-[calc(100vh-230px)] bg-white border-3 border-dark overflow-hidden shadow-[6px_6px_0px_#1A1A1A] rounded-none">
-      {/* Header bar */}
-      <div className="bg-dark px-6 py-4 border-b-3 border-dark flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 border-2 border-cream bg-yellow flex items-center justify-center rounded-none">
-            <Sparkles className="w-5 h-5 text-dark" strokeWidth={2.5} />
-          </div>
-          <div>
-            <h3 className="font-display font-extrabold text-cream text-base tracking-[0.1em] uppercase">WINGMAN</h3>
-            <p className="text-[10px] text-cream/70 font-display font-bold flex items-center gap-1.5 mt-0.5">
-              <span className="w-2 h-2 bg-teal rounded-full animate-pulse border border-dark" /> ACTIVE COMPANION
-            </p>
+    <div style={{
+      width: '100%', maxWidth: '680px', margin: '0 auto',
+      display: 'flex', flexDirection: 'column',
+      height: 'calc(100vh - 200px)', minHeight: '400px',
+      background: '#fff', border: '3px solid #1A1A1A',
+      boxShadow: '8px 8px 0 #1A1A1A', overflow: 'hidden',
+    }}>
+      {/* Header */}
+      <div style={{ background: '#1A1A1A', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ width: '40px', height: '40px', background: '#F5C842', border: '2px solid #F5C842', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '10px' }}>
+          <Sparkles size={20} strokeWidth={2.5} color="#1A1A1A" />
+        </div>
+        <div>
+          <p style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '14px', color: '#F5C842', margin: 0, letterSpacing: '0.08em' }}>WINGMAN</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ width: '6px', height: '6px', background: '#2EC4B6', borderRadius: '50%' }} />
+            <p style={{ fontFamily: 'Inter', fontSize: '10px', color: '#aaa', margin: 0, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Active Companion</p>
           </div>
         </div>
       </div>
 
-      {/* Messages area */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-cream">
-        {messages.map((msg) => {
+      {/* Messages */}
+      <div style={{ flex: 1, overflowY: 'auto', padding: '20px', background: '#FFF8F0', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        {messages.map(msg => {
           const isUser = msg.sender === 'user';
           return (
-            <div
-              key={msg.id}
-              className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}
-            >
-              <div
-                className={`max-w-[85%] border-2 border-dark px-4 py-3 text-sm leading-relaxed font-sans rounded-none shadow-[3px_3px_0px_#1A1A1A] ${
-                  isUser
-                    ? 'bg-dark text-cream'
-                    : 'bg-yellow text-dark'
-                }`}
-              >
+            <div key={msg.id} style={{ display: 'flex', justifyContent: isUser ? 'flex-end' : 'flex-start' }}>
+              <div style={{
+                maxWidth: '80%', padding: '12px 16px',
+                background: isUser ? '#1A1A1A' : '#F5C842',
+                border: '2px solid #1A1A1A',
+                boxShadow: '3px 3px 0 #1A1A1A',
+                fontFamily: 'Inter', fontSize: '14px', fontWeight: 500,
+                color: isUser ? '#FFF8F0' : '#1A1A1A', lineHeight: 1.6,
+              }}>
                 {msg.text}
-                {msg.isStreaming && (
-                  <span className="inline-block w-1.5 h-4 ml-0.5 bg-dark animate-pulse align-middle" />
-                )}
+                {msg.isStreaming && <span style={{ display: 'inline-block', width: '2px', height: '16px', background: '#1A1A1A', marginLeft: '2px', verticalAlign: 'middle', animation: 'blink 1.2s step-end infinite' }} />}
               </div>
             </div>
           );
         })}
         {isTyping && !messages.some(m => m.isStreaming) && (
-          <div className="flex justify-start">
-            <div className="bg-yellow border-2 border-dark text-dark px-4 py-3 text-sm flex items-center gap-1.5 rounded-none shadow-[3px_3px_0px_#1A1A1A]">
-              <span className="font-display font-bold text-xs">THINKING</span>
-              <span className="flex gap-1">
-                <span className="w-1.5 h-1.5 bg-dark rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                <span className="w-1.5 h-1.5 bg-dark rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                <span className="w-1.5 h-1.5 bg-dark rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-              </span>
+          <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+            <div style={{ background: '#F5C842', border: '2px solid #1A1A1A', boxShadow: '3px 3px 0 #1A1A1A', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: '11px', color: '#1A1A1A', letterSpacing: '0.06em' }}>THINKING</span>
+              {[0, 150, 300].map((d, i) => (
+                <span key={i} style={{ width: '6px', height: '6px', background: '#1A1A1A', borderRadius: '50%', animation: 'bounce 0.6s infinite', animationDelay: `${d}ms` }} />
+              ))}
             </div>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input panel */}
-      <div className="p-4 border-t-3 border-dark bg-white flex gap-3">
+      {/* Input */}
+      <div style={{ padding: '16px', borderTop: '2.5px solid #1A1A1A', background: '#fff', display: 'flex', gap: '10px' }}>
         <input
-          type="text"
-          value={inputVal}
-          onChange={(e) => setInputVal(e.target.value)}
-          onKeyDown={handleKeyPress}
+          type="text" value={inputVal}
+          onChange={e => setInputVal(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && handleSend()}
           placeholder="Ask Wingman anything..."
-          className="flex-1 bg-white border-3 border-dark text-dark text-sm font-sans px-4 py-3 focus:outline-none focus:shadow-[4px_4px_0px_#1A1A1A] focus:-translate-x-0.5 focus:-translate-y-0.5 transition-all rounded-none placeholder-muted/80"
+          style={{ flex: 1, background: '#fff', border: '2.5px solid #1A1A1A', color: '#1A1A1A', padding: '12px 16px', fontFamily: 'Inter', fontSize: '14px', outline: 'none', boxShadow: '3px 3px 0 #1A1A1A' }}
         />
-        <button
-          type="button"
-          onClick={handleSend}
-          disabled={!inputVal.trim() || isTyping}
-          className="bg-yellow hover:bg-yellow border-3 border-dark text-dark p-3 shadow-[3px_3px_0px_#1A1A1A] hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_#1A1A1A] active:translate-x-0 active:translate-y-0 active:shadow-none transition-all cursor-pointer disabled:opacity-30 disabled:pointer-events-none rounded-none shrink-0 flex items-center justify-center"
-        >
-          <Send className="w-4 h-4" />
+        <button onClick={handleSend} disabled={!inputVal.trim() || isTyping}
+          style={{ background: '#F5C842', border: '2.5px solid #1A1A1A', color: '#1A1A1A', padding: '12px 16px', cursor: 'pointer', boxShadow: '3px 3px 0 #1A1A1A', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: (!inputVal.trim() || isTyping) ? 0.4 : 1 }}>
+          <Send size={16} strokeWidth={2.5} />
         </button>
       </div>
     </div>

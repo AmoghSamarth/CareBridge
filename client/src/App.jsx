@@ -9,6 +9,7 @@ import Profile from './pages/Profile';
 import ProDashboard from './pages/ProDashboard';
 import WingmanChat from './components/WingmanChat';
 import PageBackground from './components/PageBackground';
+import WingmanPopup from './components/WingmanPopup';
 
 const Browse = lazy(() => import('./pages/Browse'));
 const Bookings = lazy(() => import('./pages/Bookings'));
@@ -55,6 +56,7 @@ function AppContent() {
               </Suspense>
             </AnimatePresence>
           </main>
+          <WingmanPopup onAskWingman={() => setActiveTab('wingman')} />
         </div>
       </div>
     </WingmanProvider>

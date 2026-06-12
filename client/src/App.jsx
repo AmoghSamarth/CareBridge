@@ -51,7 +51,7 @@ function AppContent() {
         ) : (
           <>
             <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
-            <main style={{ paddingTop: '72px', paddingBottom: '80px', minHeight: '100vh' }}>
+            <main style={{ paddingTop: '72px', paddingBottom: '80px', minHeight: '100vh', maxWidth: '100%', overflowX: 'hidden' }}>
               <AnimatePresence mode="wait">
                 <Suspense fallback={<SpinnerDots />}>
                   <motion.div

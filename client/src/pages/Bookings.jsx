@@ -5,23 +5,7 @@ import { Clock, MapPin, Sparkles, AlertCircle, ArrowRight } from 'lucide-react';
 import { db, isFirebaseInitialized } from '../lib/firebase';
 import { collection, query, where, onSnapshot, doc, updateDoc } from 'firebase/firestore';
 
-<div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '24px' }}>
-  {[
-    { label: 'TOTAL BOOKINGS', value: bookings.length, color: '#F5C842' },
-    { label: 'UPCOMING', value: bookings.filter(b => b.status === 'confirmed').length, color: '#2EC4B6' },
-    { label: 'COMPLETED', value: bookings.filter(b => b.status === 'completed').length, color: '#F03E7A' },
-  ].map(stat => (
-    <div key={stat.label} style={{
-      background: stat.color, border: '2.5px solid var(--border)',
-      boxShadow: '4px 4px 0 var(--shadow)', padding: '16px', textAlign: 'center'
-    }}>
-      <div style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '28px', color: '#1A1A1A' }}>{stat.value}</div>
-      <div style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: '9px', color: '#1A1A1A', textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: '4px' }}>{stat.label}</div>
-    </div>
-  ))}
-</div>
-
-const pill = (bg, text, children) => ({
+const pill = (bg, text) => ({
   display: 'inline-block', background: bg, color: text,
   border: '1.5px solid #1A1A1A', padding: '2px 10px',
   fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: '10px',
@@ -95,6 +79,23 @@ export default function Bookings({ setActiveTab }) {
         <p style={{ fontFamily: 'Inter', fontSize: '12px', fontWeight: 600, color: '#6B6B6B', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
           Track visits · Rate confidence · Let Wingman learn
         </p>
+      </div>
+
+      {/* Stats summary */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '24px' }}>
+        {[
+          { label: 'TOTAL BOOKINGS', value: bookings.length, color: '#F5C842' },
+          { label: 'UPCOMING', value: upcoming.length, color: '#2EC4B6' },
+          { label: 'COMPLETED', value: bookings.filter(b => b.status === 'completed').length, color: '#F03E7A' },
+        ].map(stat => (
+          <div key={stat.label} style={{
+            background: stat.color, border: '2.5px solid #1A1A1A',
+            boxShadow: '4px 4px 0 #1A1A1A', padding: '16px', textAlign: 'center'
+          }}>
+            <div style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '28px', color: '#1A1A1A' }}>{stat.value}</div>
+            <div style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: '9px', color: '#1A1A1A', textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: '4px' }}>{stat.label}</div>
+          </div>
+        ))}
       </div>
 
       {/* Tabs */}

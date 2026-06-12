@@ -8,6 +8,7 @@ import Home from './pages/Home';
 import Profile from './pages/Profile';
 import ProDashboard from './pages/ProDashboard';
 import WingmanChat from './components/WingmanChat';
+import PageBackground from './components/PageBackground';
 
 const Browse = lazy(() => import('./pages/Browse'));
 const Bookings = lazy(() => import('./pages/Bookings'));
@@ -32,26 +33,29 @@ function AppContent() {
 
   return (
     <WingmanProvider>
-      <div style={{ minHeight: '100vh', background: 'var(--bg-page)', fontFamily: 'Inter', color: 'var(--text-primary)' }}>
-        <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
-        <main style={{ paddingTop: '68px', paddingBottom: '68px', minHeight: '100vh' }}>
-          <AnimatePresence mode="wait">
-            <Suspense fallback={<SpinnerDots />}>
-              <motion.div
-                key={activeTab}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.18 }}
-              >
-                {activeTab === 'wingman'  && <Home setActiveTab={setActiveTab} />}
-                {activeTab === 'browse'   && <Browse />}
-                {activeTab === 'bookings' && <Bookings setActiveTab={setActiveTab} />}
-                {activeTab === 'profile'  && <Profile />}
-              </motion.div>
-            </Suspense>
-          </AnimatePresence>
-        </main>
+      <div style={{ minHeight: '100vh', background: 'var(--bg-page)', fontFamily: 'Inter', color: 'var(--text-primary)', position: 'relative' }}>
+        <PageBackground />
+        <div style={{ position: 'relative', zIndex: 1 }}>
+          <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
+          <main style={{ paddingTop: '68px', paddingBottom: '68px', minHeight: '100vh' }}>
+            <AnimatePresence mode="wait">
+              <Suspense fallback={<SpinnerDots />}>
+                <motion.div
+                  key={activeTab}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.18 }}
+                >
+                  {activeTab === 'wingman'  && <Home setActiveTab={setActiveTab} />}
+                  {activeTab === 'browse'   && <Browse />}
+                  {activeTab === 'bookings' && <Bookings setActiveTab={setActiveTab} />}
+                  {activeTab === 'profile'  && <Profile />}
+                </motion.div>
+              </Suspense>
+            </AnimatePresence>
+          </main>
+        </div>
       </div>
     </WingmanProvider>
   );

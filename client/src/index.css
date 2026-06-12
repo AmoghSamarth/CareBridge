@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 @theme {
+  /* Colors — maps to bg-yellow, text-dark, bg-peach, etc. */
   --color-peach: #FAE8D8;
   --color-yellow: #F5C842;
   --color-pink: #F03E7A;
@@ -8,15 +9,33 @@
   --color-lavender: #9B8FE8;
   --color-coral: #FF6B35;
   --color-dark: #1A1A1A;
-  --color-white: #FFFFFF;
   --color-muted: #6B6B6B;
+  --color-cream: #FFF8F0;
 
-  --font-sans: 'Inter', sans-serif;
-  --font-display: 'Plus Jakarta Sans', sans-serif;
+  /* Fonts — maps to font-sans and font-display */
+  --font-family-sans: 'Inter', sans-serif;
+  --font-family-display: 'Plus Jakarta Sans', sans-serif;
 
+  /* Border radius — maps to rounded-card, rounded-btn etc. */
+  --radius-card: 16px;
+  --radius-btn: 12px;
+  --radius-xl2: 20px;
+  --radius-xl3: 24px;
+
+  /* Shadows — maps to shadow-brutal, shadow-brutal-sm etc. */
   --shadow-brutal: 5px 5px 0px #1A1A1A;
   --shadow-brutal-sm: 3px 3px 0px #1A1A1A;
   --shadow-brutal-lg: 8px 8px 0px #1A1A1A;
+  --shadow-brutal-xl: 10px 10px 0px #1A1A1A;
+  --shadow-brutal-yellow: 5px 5px 0px #F5C842;
+  --shadow-brutal-pink: 5px 5px 0px #F03E7A;
+  --shadow-brutal-hover: 7px 7px 0px #1A1A1A;
+
+  /* Animations */
+  --animate-float: float 5s ease-in-out infinite;
+  --animate-float-slow: float 7s ease-in-out infinite;
+  --animate-float-rotate: float-rotate 5s ease-in-out infinite;
+  --animate-blink: blink 1.2s step-end infinite;
 }
 
 /* ── Playful Brutalism Design System (Client) ─────────────────── */
@@ -58,6 +77,21 @@
   --muted:    #BDB7AF;
 }
 
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-12px); }
+}
+
+@keyframes float-rotate {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%       { transform: translateY(-8px) rotate(12deg); }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
@@ -89,16 +123,6 @@ h1, h2, h3, h4, h5, h6 {
   font-family: 'Plus Jakarta Sans', sans-serif;
   letter-spacing: -0.02em;
   color: var(--text-primary);
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-10px); }
-}
-
-@keyframes float-rotate {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50%       { transform: translateY(-8px) rotate(12deg); }
 }
 
 ::selection {

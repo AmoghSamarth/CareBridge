@@ -119,11 +119,11 @@ export default function Bookings({ setActiveTab }) {
                     {b.wingman_recommended && <span style={pill('#2EC4B6', '#1A1A1A')}>✦ Wingman Pick</span>}
                   </div>
                   <h4 style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '16px', color: '#1A1A1A', margin: 0 }}>
-                    {b.professional_name.toUpperCase()}
+                    {(b.professional_name || 'Professional').toUpperCase()}
                   </h4>
                   <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
                     <span style={{ fontFamily: 'Inter', fontSize: '12px', fontWeight: 600, color: '#6B6B6B', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <Clock size={13} strokeWidth={2.5} /> {new Date(b.booking_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} · {b.slot}
+                      <Clock size={13} strokeWidth={2.5} /> {b.booking_date ? new Date(b.booking_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : 'Date TBD'} · {b.slot || '—'}
                     </span>
                     <span style={{ fontFamily: 'Inter', fontSize: '12px', fontWeight: 600, color: '#6B6B6B', display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <MapPin size={13} strokeWidth={2.5} /> {b.area || 'Nagpur'}
@@ -168,8 +168,8 @@ export default function Bookings({ setActiveTab }) {
                       <span style={pill('#F03E7A', '#fff')}>{b.service}</span>
                       <span style={pill(b.status === 'completed' ? '#2EC4B6' : '#FF6B35', '#1A1A1A')}>{b.status}</span>
                     </div>
-                    <h4 style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '15px', color: '#1A1A1A', margin: 0 }}>{b.professional_name.toUpperCase()}</h4>
-                    <p style={{ fontFamily: 'Inter', fontSize: '12px', color: '#6B6B6B', margin: 0 }}>{new Date(b.booking_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} · {b.slot}</p>
+                    <h4 style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '15px', color: '#1A1A1A', margin: 0 }}>{(b.professional_name || 'Professional').toUpperCase()}</h4>
+                    <p style={{ fontFamily: 'Inter', fontSize: '12px', color: '#6B6B6B', margin: 0 }}>{b.booking_date ? new Date(b.booking_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : 'Date TBD'} · {b.slot || '—'}</p>
                   </div>
                   {b.confidence_score > 0 && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#F5C842', border: '2px solid #1A1A1A', padding: '4px 12px', boxShadow: '2px 2px 0 #1A1A1A' }}>

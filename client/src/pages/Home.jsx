@@ -75,7 +75,7 @@ export default function Home({ setActiveTab }) {
   };
 
   return (
-    <div className="pb-28 pt-20 px-4 max-w-4xl mx-auto space-y-8">
+    <div className="pb-28 pt-20 px-4 max-w-6xl mx-auto space-y-8">
       {/* If onboarding is not complete, focus completely on the onboarding flow */}
       {!onboardingComplete ? (
         <div className="py-8">
@@ -118,10 +118,10 @@ export default function Home({ setActiveTab }) {
               </button>
             </div>
 
-            {/* Horizontal scroll listing */}
-            <div className="flex gap-6 overflow-x-auto pb-6 pt-1 snap-x scrollbar-none">
+            {/* Responsive listing */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {homeProfessionals.map((pro) => (
-                <div key={pro.id} className="snap-center">
+                <div key={pro.id} className="w-full">
                   <ProfessionalCard 
                     professional={pro} 
                     onBook={handleBookInitiate} 

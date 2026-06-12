@@ -16,14 +16,14 @@ export default function ProfessionalCard({ professional, onBook, onViewProfile }
   } = professional;
 
   return (
-    <div className="w-[280px] sm:w-[320px] bg-white border-3 border-dark overflow-hidden shadow-brutal hover:-translate-x-1 hover:-translate-y-1 hover:shadow-brutal-hover transition-all duration-150 flex flex-col justify-between shrink-0 group rounded-none">
+    <div className="border-2.5 border-dark rounded-card shadow-brutal bg-white overflow-hidden hover:-translate-x-1 hover:-translate-y-1 hover:shadow-brutal-hover transition-all duration-150 flex flex-col justify-between group">
       
       {/* Top Image & Badge */}
-      <div className="relative h-44 w-full overflow-hidden border-b-3 border-dark">
+      <div className="relative w-full overflow-hidden border-b-3 border-dark">
         <img 
           src={image_url || 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&q=80&w=400'} 
           alt={name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500"
         />
         <div className="absolute top-3 right-3 bg-white border-2 border-dark px-2.5 py-1 rounded-none flex items-center gap-1 shadow-[2px_2px_0px_#1A1A1A]">
           <Star className="w-3.5 h-3.5 fill-yellow text-dark" strokeWidth={2.5} />

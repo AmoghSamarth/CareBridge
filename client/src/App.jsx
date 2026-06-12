@@ -33,7 +33,7 @@ function AppContent() {
 
   return (
     <WingmanProvider>
-      <div style={{ minHeight: '100vh', background: 'var(--bg-page)', fontFamily: 'Inter', color: 'var(--text-primary)' }}>
+      <div className="page-wrapper" style={{ minHeight: '100vh', background: 'var(--bg-page)', fontFamily: 'Inter', color: 'var(--text-primary)' }}>
         {!onboardingComplete ? (
           <main style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
             <div className="w-full max-w-lg">

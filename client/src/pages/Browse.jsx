@@ -93,7 +93,7 @@ export default function Browse() {
   };
 
   return (
-    <div className="pb-28 pt-20 px-4 max-w-4xl mx-auto space-y-6">
+    <div className="pb-28 pt-20 px-4 max-w-6xl mx-auto space-y-6">
       
       {/* Title */}
       <div className="select-none">
@@ -187,7 +187,7 @@ export default function Browse() {
       </div>
 
       {/* Grid listing */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 justify-items-center pt-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {professionals.length > 0 ? (
           professionals.map((pro, i) => (
             <motion.div
@@ -195,7 +195,7 @@ export default function Browse() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: i * 0.05 }}
-              className="w-full flex justify-center"
+              className="w-full"
             >
               <ProfessionalCard 
                 professional={pro} 

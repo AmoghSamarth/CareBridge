@@ -99,3 +99,8 @@ h1, h2, h3, h4, h5, h6 {
 .scrollbar-none::-webkit-scrollbar {
   display: none;
 }
+
+.page-wrapper {
+  position: relative;
+  overflow-x: hidden;
+}

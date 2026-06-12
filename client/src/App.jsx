@@ -1,7 +1,7 @@
 import React, { useState, Suspense, lazy } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { getLandingUrl } from './lib/urls';
+import { ThemeProvider } from './context/ThemeContext';
 import { WingmanProvider } from './context/WingmanContext';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
@@ -24,27 +24,16 @@ const SpinnerDots = () => (
 );
 
 function AppContent() {
-  const { user, loading, onboardingComplete } = useAuth();
+  const { loading, onboardingComplete } = useAuth();
   const [activeTab, setActiveTab] = useState('wingman');
 
   if (loading) return <SpinnerDots />;
 
   if (window.location.pathname === '/pro-dashboard') return <ProDashboard />;
 
-  if (!user) {
-    window.location.href = getLandingUrl();
-    return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#FAE8D8' }}>
-        <p style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: '14px', color: '#6B6B6B' }}>
-          Redirecting to CareBridge...
-        </p>
-      </div>
-    );
-  }
-
   return (
     <WingmanProvider>
-      <div style={{ minHeight: '100vh', background: '#FFF8F0', fontFamily: 'Inter' }}>
+      <div style={{ minHeight: '100vh', background: 'var(--bg-page)', fontFamily: 'Inter', color: 'var(--text-primary)' }}>
         {!onboardingComplete ? (
           <main style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
             <div className="w-full max-w-lg">
@@ -89,8 +78,10 @@ function AppContent() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

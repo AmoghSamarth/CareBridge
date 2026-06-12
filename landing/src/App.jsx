@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext.jsx';
 import LandingPage from './pages/LandingPage.jsx';
-import AuthPage from './pages/AuthPage.jsx';
+import StartPage from './pages/StartPage.jsx';
 import FloatingShapes from './components/FloatingShapes.jsx';
 
 export default function App() {
@@ -16,7 +16,7 @@ export default function App() {
           <div className="content-card">
             <Routes>
               <Route path="/" element={<LandingPage />} />
-              <Route path="/auth" element={<AuthPage />} />
+              <Route path="/start" element={<StartPage />} />
             </Routes>
           </div>
         </div>

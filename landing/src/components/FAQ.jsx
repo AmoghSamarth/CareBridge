@@ -9,7 +9,7 @@ const items = [
   { q: 'Can I cancel or reschedule a booking?', a: 'Yes — cancel or reschedule up to 2 hours before your appointment for free. Late cancellations may incur a small fee.' },
   { q: 'What if I\'m not happy with the service?', a: 'We have a 100% satisfaction guarantee. Report an issue within 24 hours and we\'ll arrange a free redo or full refund.' },
   { q: 'How does Wingman Pro differ from free?', a: 'Pro gives you unlimited AI suggestions, emergency booking access, AI style previews, and priority professional matching — all for ₹99/month.' },
-  { q: 'How can professionals join?', a: 'Sign up with the "Professional" role on the auth page. After verification (1-2 days), your profile goes live and Wingman starts sending you clients.' },
+  { q: 'How can professionals join?', a: 'Choose the "Professional" role on the start page. After verification (1-2 days), your profile goes live and Wingman starts sending you clients.' },
 ];
 
 export default function FAQ() {

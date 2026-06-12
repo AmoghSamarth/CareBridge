@@ -65,23 +65,23 @@ export default function WingmanDemo() {
             }}>
               Watch Wingman work
             </h2>
-            <p style={{ fontFamily: 'Inter', fontSize: '16px', color: '#9B8FE8', margin: 0 }}>
+            <p style={{ fontFamily: 'Inter', fontSize: '16px', color: '#FFFFFF', margin: 0, opacity: 0.78 }}>
               This is a real conversation. Click a scenario below.
             </p>
           </div>
 
           {/* Chat card */}
           <div style={{
-            background: '#FFFFFF', border: '2.5px solid #F5C842',
-            borderRadius: '20px', boxShadow: '6px 6px 0 #F5C842',
+            background: '#FFFFFF', border: '2.5px solid #1A1A1A',
+            borderRadius: '20px', boxShadow: '6px 6px 0 #1A1A1A',
             overflow: 'hidden',
           }}>
             {/* Header */}
             <div style={{
-              background: '#1A1A1A', borderBottom: '2px solid #F5C842',
+              background: '#1A1A1A', borderBottom: '2px solid #1A1A1A',
               padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '10px',
             }}>
-              <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#2EC4B6' }} />
+              <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#F5C842' }} />
               <span style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '13px', letterSpacing: '0.1em', color: '#F5C842' }}>
                 WINGMAN DEMO
               </span>
@@ -175,17 +175,17 @@ export default function WingmanDemo() {
           </div>
 
           <button
-            onClick={() => navigate('/auth')}
+            onClick={() => navigate('/start')}
             style={{
               fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '15px',
               color: '#1A1A1A', background: '#F5C842',
-              border: '2.5px solid #F5C842', borderRadius: '12px',
-              boxShadow: '4px 4px 0 #F5C842',
+              border: '2.5px solid #1A1A1A', borderRadius: '12px',
+              boxShadow: '4px 4px 0 #1A1A1A',
               padding: '14px 28px', cursor: 'pointer',
               transition: 'transform 0.15s, box-shadow 0.15s',
             }}
-            onMouseEnter={e => { e.currentTarget.style.transform='translate(-2px,-2px)'; e.currentTarget.style.boxShadow='6px 6px 0 #F5C842'; }}
-            onMouseLeave={e => { e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow='4px 4px 0 #F5C842'; }}
+            onMouseEnter={e => { e.currentTarget.style.transform='translate(-2px,-2px)'; e.currentTarget.style.boxShadow='6px 6px 0 #1A1A1A'; }}
+            onMouseLeave={e => { e.currentTarget.style.transform=''; e.currentTarget.style.boxShadow='4px 4px 0 #1A1A1A'; }}
           >
             TRY WINGMAN YOURSELF →
           </button>

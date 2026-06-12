@@ -3,7 +3,14 @@
 @tailwind utilities;
 
 /* ── Playful Brutalism Design System (Client) ─────────────────── */
-:root {
+:root, [data-theme="light"] {
+  --bg-page: #FAE8D8;
+  --bg-card: #FFFFFF;
+  --bg-nav: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-muted: #6B6B6B;
+  --border: #1A1A1A;
+  --shadow: #1A1A1A;
   --peach:    #FAE8D8;
   --yellow:   #F5C842;
   --pink:     #F03E7A;
@@ -13,6 +20,25 @@
   --dark:     #1A1A1A;
   --white:    #FFFFFF;
   --muted:    #6B6B6B;
+}
+
+[data-theme="dark"] {
+  --bg-page: #1A1A1A;
+  --bg-card: #2A2A2A;
+  --bg-nav: #1A1A1A;
+  --text-primary: #FAE8D8;
+  --text-muted: #BDB7AF;
+  --border: #FAE8D8;
+  --shadow: #FAE8D8;
+  --peach:    #FAE8D8;
+  --yellow:   #F5C842;
+  --pink:     #F03E7A;
+  --teal:     #2EC4B6;
+  --lavender: #9B8FE8;
+  --coral:    #FF6B35;
+  --dark:     #1A1A1A;
+  --white:    #FFFFFF;
+  --muted:    #BDB7AF;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -34,8 +60,8 @@ html {
 }
 
 body {
-  background-color: #FAE8D8;
-  color: #1A1A1A;
+  background-color: var(--bg-page);
+  color: var(--text-primary);
   font-family: 'Inter', sans-serif;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -45,7 +71,7 @@ body {
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Plus Jakarta Sans', sans-serif;
   letter-spacing: -0.02em;
-  color: #1A1A1A;
+  color: var(--text-primary);
 }
 
 @keyframes float {
@@ -64,8 +90,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 ::-webkit-scrollbar       { width: 4px; }
-::-webkit-scrollbar-track { background: #FAE8D8; }
-::-webkit-scrollbar-thumb { background: #1A1A1A; border-radius: 2px; }
+::-webkit-scrollbar-track { background: var(--bg-page); }
+::-webkit-scrollbar-thumb { background: var(--text-primary); border-radius: 2px; }
 
 .scrollbar-none {
   scrollbar-width: none;

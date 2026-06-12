@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useWingman } from '../context/WingmanContext';
-import { db, isFirebaseInitialized, auth } from '../lib/firebase';
+import { db, isFirebaseInitialized } from '../lib/firebase';
 import { getLandingUrl } from '../lib/urls';
 import { 
   doc, 
@@ -336,14 +336,6 @@ export default function Profile() {
         await deleteDoc(doc(db, 'users', user.uid));
       } catch (err) {
         console.error('Firestore delete profile failed:', err);
-      }
-    }
-
-    if (isFirebaseInitialized && auth && auth.currentUser) {
-      try {
-        await auth.currentUser.delete();
-      } catch (err) {
-        console.error('Firebase Auth delete user failed:', err);
       }
     }
 

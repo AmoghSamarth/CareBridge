@@ -2,7 +2,7 @@ import React from 'react';
 
 const features = [
   {
-    cardBg: '#FFFFFF',
+    cardBg: '#FFF6D6',
     iconBg: '#F5C842',
     title: 'Wingman AI',
     body: 'Your autonomous grooming companion that predicts needs, books slots, and never lets you down.',
@@ -13,7 +13,7 @@ const features = [
     ),
   },
   {
-    cardBg: '#FFFFFF',
+    cardBg: '#FFE1EC',
     iconBg: '#F03E7A',
     title: 'Emergency Booking',
     body: 'SOS! Need a stylist in 2 hours? We alert nearby professionals and get you covered fast.',
@@ -24,7 +24,7 @@ const features = [
     ),
   },
   {
-    cardBg: '#FFFFFF',
+    cardBg: '#DDF7F4',
     iconBg: '#2EC4B6',
     title: 'Smart Matching',
     body: 'AI-powered matching based on style, budget, proximity, and past preferences.',
@@ -35,7 +35,7 @@ const features = [
     ),
   },
   {
-    cardBg: '#FFFFFF',
+    cardBg: '#EEEAFB',
     iconBg: '#9B8FE8',
     title: 'Predictive Planner',
     body: 'Wingman reads your calendar and suggests grooming slots before important events.',
@@ -46,7 +46,7 @@ const features = [
     ),
   },
   {
-    cardBg: '#FFFFFF',
+    cardBg: '#FFF6D6',
     iconBg: '#F5C842',
     title: 'Style Preview',
     body: 'See AI-generated previews of recommended styles before you commit to a booking.',
@@ -57,7 +57,7 @@ const features = [
     ),
   },
   {
-    cardBg: '#FFFFFF',
+    cardBg: '#FFE1EC',
     iconBg: '#F03E7A',
     title: 'Beauty Twin',
     body: 'Build your AI beauty profile. Wingman learns your preferences and improves every booking.',

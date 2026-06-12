@@ -1,7 +1,8 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
+import Logo from './Logo';
 
-// Inline SVG icons — no lucide-react needed
 const HomeIcon = ({ active }) => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill={active ? '#1A1A1A' : 'none'} stroke="#1A1A1A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
     <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
@@ -27,6 +28,16 @@ const LogOutIcon = () => (
     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
   </svg>
 );
+const SunIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+    <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+  </svg>
+);
+const MoonIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+  </svg>
+);
 
 const tabColors = {
   wingman: '#F5C842',
@@ -44,34 +55,48 @@ const navItems = [
 
 export default function Navbar({ activeTab, setActiveTab }) {
   const { user, logout } = useAuth();
+  const { theme, toggle } = useTheme();
+
+  const buttonBase = {
+    width: '32px',
+    height: '32px',
+    borderRadius: '8px',
+    border: '2px solid var(--border)',
+    boxShadow: '2px 2px 0 var(--shadow)',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    transition: 'transform 0.12s, box-shadow 0.12s',
+  };
+
+  const lift = e => {
+    e.currentTarget.style.transform = 'translate(-1px,-1px)';
+    e.currentTarget.style.boxShadow = '3px 3px 0 var(--shadow)';
+  };
+  const settle = e => {
+    e.currentTarget.style.transform = '';
+    e.currentTarget.style.boxShadow = '2px 2px 0 var(--shadow)';
+  };
 
   return (
     <>
-      {/* Top header */}
       <header style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 50,
         height: '68px',
-        background: '#FFFFFF',
-        borderBottom: '2.5px solid #1A1A1A',
+        background: 'var(--bg-nav)',
+        borderBottom: '2.5px solid var(--border)',
         display: 'flex', alignItems: 'center',
         justifyContent: 'space-between',
         padding: '0 20px',
       }}>
-        {/* Logo */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{
-            width: '28px', height: '28px', background: '#9B8FE8',
-            border: '2px solid #1A1A1A', borderRadius: '8px',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <span style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '14px', color: '#fff' }}>C</span>
-          </div>
-          <span style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '18px', color: '#1A1A1A', letterSpacing: '-0.02em' }}>
+          <Logo size="sm" />
+          <span style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '18px', color: 'var(--text-primary)' }}>
             CareBridge
           </span>
         </div>
 
-        {/* User row */}
         {user && (
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             {user.photoURL ? (
@@ -89,20 +114,20 @@ export default function Navbar({ activeTab, setActiveTab }) {
                 </span>
               </div>
             )}
-            <span style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: '13px', color: '#1A1A1A' }}
-              className="hidden sm:inline">
+            <span style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: '13px', color: 'var(--text-primary)' }} className="hidden sm:inline">
               {(user.displayName || '').split(' ')[0]}
             </span>
+            <button onClick={toggle} title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+              style={{ ...buttonBase, background: '#F5C842', color: '#1A1A1A' }}
+              onMouseEnter={lift}
+              onMouseLeave={settle}
+            >
+              {theme === 'light' ? <MoonIcon /> : <SunIcon />}
+            </button>
             <button onClick={logout} title="Sign out"
-              style={{
-                width: '32px', height: '32px', borderRadius: '8px',
-                border: '2px solid #1A1A1A', background: '#FFFFFF',
-                boxShadow: '2px 2px 0 #1A1A1A', cursor: 'pointer',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                color: '#1A1A1A', transition: 'transform 0.12s, box-shadow 0.12s',
-              }}
-              onMouseEnter={e => { e.currentTarget.style.transform = 'translate(-1px,-1px)'; e.currentTarget.style.boxShadow = '3px 3px 0 #1A1A1A'; }}
-              onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '2px 2px 0 #1A1A1A'; }}
+              style={{ ...buttonBase, background: 'var(--bg-card)', color: 'var(--text-primary)' }}
+              onMouseEnter={lift}
+              onMouseLeave={settle}
             >
               <LogOutIcon />
             </button>
@@ -110,12 +135,11 @@ export default function Navbar({ activeTab, setActiveTab }) {
         )}
       </header>
 
-      {/* Bottom navigation */}
       <nav style={{
         position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50,
         height: '68px',
-        background: '#FFFFFF',
-        borderTop: '2.5px solid #1A1A1A',
+        background: 'var(--bg-nav)',
+        borderTop: '2.5px solid var(--border)',
         borderRadius: '20px 20px 0 0',
         display: 'flex', alignItems: 'center', justifyContent: 'space-around',
       }}>
@@ -144,8 +168,8 @@ export default function Navbar({ activeTab, setActiveTab }) {
               </div>
               <span style={{
                 fontFamily: 'Plus Jakarta Sans', fontWeight: 700,
-                fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.06em',
-                color: isActive ? '#1A1A1A' : '#6B6B6B',
+                fontSize: '9px', textTransform: 'uppercase',
+                color: isActive ? 'var(--text-primary)' : 'var(--text-muted)',
               }}>
                 {label}
               </span>

@@ -215,7 +215,7 @@ export default function Hero() {
           {/* Buttons */}
           <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
             <button
-              onClick={() => navigate('/auth')}
+              onClick={() => navigate('/start')}
               style={{
                 fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '16px',
                 color: '#1A1A1A', background: '#F5C842',
@@ -230,7 +230,7 @@ export default function Hero() {
               MEET YOUR WINGMAN
             </button>
             <button
-              onClick={() => navigate('/auth')}
+              onClick={() => navigate('/start')}
               style={{
                 fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '16px',
                 color: '#1A1A1A', background: '#2EC4B6',

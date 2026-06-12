@@ -45,7 +45,7 @@ export default function ForProfessionals() {
           </p>
 
           <button
-            onClick={() => navigate('/auth')}
+            onClick={() => navigate('/start')}
             style={{
               fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '16px',
               color: '#1A1A1A', background: '#F5C842',

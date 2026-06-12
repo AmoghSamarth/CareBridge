@@ -117,9 +117,8 @@ export default function Navbar() {
           {theme === 'light' ? <MoonIcon /> : <SunIcon />}
         </button>
 
-        {/* Login button */}
         <button
-          onClick={() => navigate('/auth')}
+          onClick={() => navigate('/start')}
           style={{
             fontFamily: 'Plus Jakarta Sans',
             fontWeight: 700,
@@ -142,14 +141,33 @@ export default function Navbar() {
             e.currentTarget.style.boxShadow = '3px 3px 0 #1A1A1A';
           }}
         >
-          LOGIN
+          GET STARTED
         </button>
       </div>
 
       {/* Mobile controls */}
       <div className="flex items-center gap-3 md:hidden">
         <button
-          onClick={() => navigate('/auth')}
+          onClick={toggle}
+          style={{
+            width: '36px',
+            height: '36px',
+            border: '2px solid #1A1A1A',
+            borderRadius: '8px',
+            background: '#F5C842',
+            boxShadow: '2px 2px 0 #1A1A1A',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            color: '#1A1A1A',
+          }}
+          title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+        >
+          {theme === 'light' ? <MoonIcon /> : <SunIcon />}
+        </button>
+        <button
+          onClick={() => navigate('/start')}
           style={{
             fontFamily: 'Plus Jakarta Sans',
             fontWeight: 700,
@@ -163,7 +181,7 @@ export default function Navbar() {
             cursor: 'pointer',
           }}
         >
-          LOGIN
+          GET STARTED
         </button>
         <button
           onClick={() => setIsOpen(!isOpen)}
@@ -214,7 +232,7 @@ export default function Navbar() {
               How it works
             </button>
             <button
-              onClick={() => { setIsOpen(false); navigate('/auth'); }}
+              onClick={() => { setIsOpen(false); navigate('/start'); }}
               style={{
                 fontFamily: 'Plus Jakarta Sans',
                 fontWeight: 800,
@@ -228,7 +246,7 @@ export default function Navbar() {
                 cursor: 'pointer',
               }}
             >
-              LOGIN TO CAREBRIDGE
+              GET STARTED
             </button>
           </motion.div>
         )}

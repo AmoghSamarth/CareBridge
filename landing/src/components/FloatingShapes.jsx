@@ -1,144 +1,113 @@
 import React from 'react';
 
-/**
- * FloatingShapes — organic decorative shapes that float on the peach
- * .page-wrapper background OUTSIDE the white .content-card.
- * They are position: fixed so they stay visible as the user scrolls.
- */
+const iconProps = {
+  width: 34,
+  height: 34,
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  stroke: '#1A1A1A',
+  strokeWidth: 2.2,
+  strokeLinecap: 'round',
+  strokeLinejoin: 'round',
+};
+
+const icons = {
+  scissors: (
+    <svg {...iconProps}>
+      <circle cx="6" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/>
+      <path d="M8.2 7.8 20 19M8.2 16.2 20 5"/>
+    </svg>
+  ),
+  comb: (
+    <svg {...iconProps}>
+      <path d="M4 7h16v4H4z"/>
+      <path d="M6 11v7M9 11v6M12 11v7M15 11v6M18 11v7"/>
+    </svg>
+  ),
+  dryer: (
+    <svg {...iconProps}>
+      <path d="M4 8h10l5-2v8l-5-2H4z"/>
+      <path d="M10 12v7H7l-1-7M19 9h2M19 12h2"/>
+    </svg>
+  ),
+  polish: (
+    <svg {...iconProps}>
+      <path d="M10 3h4v4h-4zM8 8h8l1 11a2 2 0 0 1-2 2H9a2 2 0 0 1-2-2z"/>
+      <path d="M10 13h4"/>
+    </svg>
+  ),
+  sparkle: (
+    <svg {...iconProps}>
+      <path d="m12 3-1.8 5.2a2 2 0 0 1-1.2 1.2L4 11l5 1.6a2 2 0 0 1 1.2 1.2L12 21l1.8-7.2a2 2 0 0 1 1.2-1.2L20 11l-5-1.6a2 2 0 0 1-1.2-1.2Z"/>
+    </svg>
+  ),
+  calendar: (
+    <svg {...iconProps}>
+      <rect x="4" y="5" width="16" height="15" rx="2"/>
+      <path d="M8 3v4M16 3v4M4 10h16M8 15h4"/>
+    </svg>
+  ),
+  trimmer: (
+    <svg {...iconProps}>
+      <path d="M8 3h8v4H8zM9 7h6l2 13H7z"/>
+      <path d="M10 11h4M11 15h2"/>
+    </svg>
+  ),
+  lipstick: (
+    <svg {...iconProps}>
+      <path d="M10 8V5l4-2v5M9 8h6v11a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2z"/>
+      <path d="M9 13h6"/>
+    </svg>
+  ),
+  spray: (
+    <svg {...iconProps}>
+      <path d="M9 8h7v3H9zM11 11h4v10h-4zM11 5h3v3h-3z"/>
+      <path d="M16 7h4M19 4l2-1M19 10l2 1M6 14h5"/>
+    </svg>
+  ),
+};
+
+const badges = [
+  { icon: 'scissors', className: 'shape-float', top: '8%', left: '-16px', size: 64, bg: '#2EC4B6', rotate: '-12deg', delay: '0s' },
+  { icon: 'dryer', className: 'shape-float-delay1', top: '6%', right: '-12px', size: 68, bg: '#F03E7A', rotate: '14deg', delay: '0.5s' },
+  { icon: 'comb', className: 'shape-float-slow', top: '34%', left: '-18px', size: 58, bg: '#9B8FE8', rotate: '10deg', delay: '1s' },
+  { icon: 'calendar', className: 'shape-float-delay2', bottom: '16%', right: '-18px', size: 66, bg: '#F5C842', rotate: '-16deg', delay: '1s' },
+  { icon: 'polish', className: 'shape-float-delay3', bottom: '10%', left: '-10px', size: 56, bg: '#F03E7A', rotate: '12deg', delay: '0.8s' },
+  { icon: 'sparkle', className: 'shape-rotate', top: '14%', right: '8%', size: 52, bg: '#F5C842', rotate: '18deg', delay: '0.3s' },
+  { icon: 'trimmer', className: 'shape-float-delay1', top: '55%', right: '-12px', size: 58, bg: '#2EC4B6', rotate: '-10deg', delay: '1.2s' },
+  { icon: 'lipstick', className: 'shape-float', bottom: '30%', left: '2%', size: 50, bg: '#9B8FE8', rotate: '15deg', delay: '2s' },
+  { icon: 'spray', className: 'shape-float-slow', top: '72%', right: '7%', size: 54, bg: '#F5C842', rotate: '-14deg', delay: '1.6s' },
+];
+
 export default function FloatingShapes() {
   return (
     <div className="shapes-layer" aria-hidden="true">
-
-      {/* Shape 1 — Top left: Teal half circle */}
-      <div
-        className="shape-float"
-        style={{
-          position: 'fixed',
-          top: '8%',
-          left: '-20px',
-          width: '100px',
-          height: '50px',
-          background: '#2EC4B6',
-          border: '3px solid #1A1A1A',
-          borderRadius: '0 0 50px 50px',
-          animationDelay: '0s',
-        }}
-      />
-
-      {/* Shape 2 — Top right: Hot pink quarter circle */}
-      <div
-        className="shape-float-delay1"
-        style={{
-          position: 'fixed',
-          top: '5%',
-          right: '-15px',
-          width: '90px',
-          height: '90px',
-          background: '#F03E7A',
-          border: '3px solid #1A1A1A',
-          borderRadius: '90px 0 0 0',
-          animationDelay: '0.5s',
-        }}
-      />
-
-      {/* Shape 3 — Middle left: Lavender circle */}
-      <div
-        className="shape-float-slow"
-        style={{
-          position: 'fixed',
-          top: '40%',
-          left: '-20px',
-          width: '80px',
-          height: '80px',
-          background: '#9B8FE8',
-          border: '3px solid #1A1A1A',
-          borderRadius: '50%',
-          animationDelay: '1s',
-        }}
-      />
-
-      {/* Shape 4 — Bottom right: Yellow quarter circle */}
-      <div
-        className="shape-float-delay2"
-        style={{
-          position: 'fixed',
-          bottom: '15%',
-          right: '-25px',
-          width: '100px',
-          height: '100px',
-          background: '#F5C842',
-          border: '3px solid #1A1A1A',
-          borderRadius: '0 0 0 100px',
-          animationDelay: '1s',
-        }}
-      />
-
-      {/* Shape 5 — Bottom left: Coral half circle */}
-      <div
-        className="shape-float-delay3"
-        style={{
-          position: 'fixed',
-          bottom: '10%',
-          left: '-15px',
-          width: '70px',
-          height: '35px',
-          background: '#FF6B35',
-          border: '3px solid #1A1A1A',
-          borderRadius: '35px 35px 0 0',
-          animationDelay: '0.8s',
-        }}
-      />
-
-      {/* Shape 6 — Top center-right: Small yellow triangle */}
-      <div
-        className="shape-float"
-        style={{
-          position: 'fixed',
-          top: '12%',
-          right: '8%',
-          width: 0,
-          height: 0,
-          borderTop: '20px solid transparent',
-          borderBottom: '20px solid transparent',
-          borderLeft: '34px solid #F5C842',
-          filter: 'drop-shadow(2px 2px 0 #1A1A1A)',
-          animationDelay: '0.3s',
-        }}
-      />
-
-      {/* Shape 7 — Middle right: Pink rounded square rotated */}
-      <div
-        className="shape-rotate"
-        style={{
-          position: 'fixed',
-          top: '55%',
-          right: '-15px',
-          width: '60px',
-          height: '60px',
-          background: '#F03E7A',
-          border: '3px solid #1A1A1A',
-          borderRadius: '12px',
-          transform: 'rotate(15deg)',
-          animationDelay: '1.2s',
-        }}
-      />
-
-      {/* Shape 8 — Extra: Teal small circle, left middle-bottom */}
-      <div
-        className="shape-float-delay1"
-        style={{
-          position: 'fixed',
-          bottom: '30%',
-          left: '2%',
-          width: '36px',
-          height: '36px',
-          background: '#2EC4B6',
-          border: '3px solid #1A1A1A',
-          borderRadius: '50%',
-          animationDelay: '2s',
-        }}
-      />
-
+      {badges.map((badge, index) => (
+        <div
+          key={`${badge.icon}-${index}`}
+          className={badge.className}
+          style={{
+            position: 'fixed',
+            top: badge.top,
+            right: badge.right,
+            bottom: badge.bottom,
+            left: badge.left,
+            width: badge.size,
+            height: badge.size,
+            background: badge.bg,
+            border: '2.5px solid #1A1A1A',
+            borderRadius: '14px',
+            boxShadow: '3px 3px 0 #1A1A1A',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transform: `rotate(${badge.rotate})`,
+            animationDelay: badge.delay,
+          }}
+        >
+          {icons[badge.icon]}
+        </div>
+      ))}
     </div>
   );
 }

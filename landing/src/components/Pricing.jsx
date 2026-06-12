@@ -9,7 +9,7 @@ const plans = [
     bg: '#FFFFFF',
     shadow: '5px 5px 0 #1A1A1A',
     tag: null,
-    checkColor: '#2EC4B6',
+    checkColor: '#FFFFFF',
     features: [
       'Wingman AI (5 suggestions/month)',
       'Browse & book professionals',
@@ -47,7 +47,7 @@ const plans = [
     bg: '#2EC4B6',
     shadow: '5px 5px 0 #1A1A1A',
     tag: null,
-    checkColor: '#F5C842',
+    checkColor: '#FFFFFF',
     features: [
       'Everything in Wingman Pro',
       'Professional dashboard access',
@@ -116,7 +116,7 @@ export default function Pricing() {
                   top: '-14px',
                   left: '50%',
                   transform: 'translateX(-50%)',
-                  background: '#F03E7A',
+                  background: '#1A1A1A',
                   border: '2px solid #1A1A1A',
                   borderRadius: '999px',
                   padding: '4px 16px',
@@ -178,7 +178,7 @@ export default function Pricing() {
 
               {/* CTA */}
               <button
-                onClick={() => navigate('/auth')}
+                onClick={() => navigate('/start')}
                 style={{
                   width: '100%',
                   fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '14px',

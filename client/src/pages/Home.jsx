@@ -8,154 +8,127 @@ import BookingModal from '../components/BookingModal';
 import EmergencyBanner from '../components/EmergencyBanner';
 import ProfessionalPanel from '../components/ProfessionalPanel';
 import EmergencyModal from '../components/EmergencyModal';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+
+const homeProfessionals = [
+  {
+    id: 'ravi-sharma',
+    name: 'Ravi Sharma',
+    area: 'Dharampeth',
+    services: ['haircut', 'beard'],
+    price_range: '150-300',
+    rating: 4.9,
+    review_count: 32,
+    experience_years: 6,
+    is_available: true,
+    image_url: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&q=80&w=400',
+    ai_summary: 'Customers love his attention to detail for classic cuts and beard trims.'
+  },
+  {
+    id: 'priya-desai',
+    name: 'Priya Desai',
+    area: 'Sitabuldi',
+    services: ['facial', 'waxing', 'threading'],
+    price_range: '300-500',
+    rating: 4.8,
+    review_count: 24,
+    experience_years: 4,
+    is_available: true,
+    image_url: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&q=80&w=400',
+    ai_summary: 'Clients rave about her soothing facials and painless threading care.'
+  },
+  {
+    id: 'mohit-thakur',
+    name: 'Mohit Thakur',
+    area: 'Sadar',
+    services: ['haircut', 'beard', 'hair color'],
+    price_range: '250-450',
+    rating: 4.7,
+    review_count: 18,
+    experience_years: 5,
+    is_available: true,
+    image_url: 'https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&q=80&w=400',
+    ai_summary: 'Praised for modern trend styling and vibrant hair coloring techniques.'
+  }
+];
 
 export default function Home({ setActiveTab }) {
-  const { user } = useAuth();
   const { onboardingComplete } = useWingman();
   const [selectedPro, setSelectedPro] = useState(null);
   const [panelPro, setPanelPro] = useState(null);
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [isEmergencyOpen, setIsEmergencyOpen] = useState(false);
 
-  // Mock list of professionals for home screen carousel
-  const homeProfessionals = [
-    {
-      id: 'ravi-sharma',
-      name: "Ravi Sharma",
-      area: "Dharampeth",
-      services: ["haircut", "beard"],
-      price_range: "150-300",
-      rating: 4.9,
-      review_count: 32,
-      experience_years: 6,
-      is_available: true,
-      image_url: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&q=80&w=400",
-      ai_summary: "Customers love his attention to detail for classic cuts and beard trims."
-    },
-    {
-      id: 'priya-desai',
-      name: "Priya Desai",
-      area: "Sitabuldi",
-      services: ["facial", "waxing", "threading"],
-      price_range: "300-500",
-      rating: 4.8,
-      review_count: 24,
-      experience_years: 4,
-      is_available: true,
-      image_url: "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&q=80&w=400",
-      ai_summary: "Clients rave about her soothing facials and painless threading care."
-    },
-    {
-      id: 'mohit-thakur',
-      name: "Mohit Thakur",
-      area: "Sadar",
-      services: ["haircut", "beard", "hair color"],
-      price_range: "250-450",
-      rating: 4.7,
-      review_count: 18,
-      experience_years: 5,
-      is_available: true,
-      image_url: "https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&q=80&w=400",
-      ai_summary: "Praised for modern trend styling and vibrant hair coloring techniques."
-    }
-  ];
+  const handleBookInitiate = (pro) => { setSelectedPro(pro); setIsBookingOpen(true); };
 
-  const handleBookInitiate = (pro) => {
-    setSelectedPro(pro);
-    setIsBookingOpen(true);
-  };
-
-  const handleEmergencyTrigger = () => {
-    setIsEmergencyOpen(true);
-  };
-
-  const handleBookingConfirmed = (bookingDetails) => {
-    // Save to list or let system handle it
-  };
-
-  return (
-    <div className="pb-28 pt-20 px-4 max-w-6xl mx-auto space-y-8">
-      {/* If onboarding is not complete, focus completely on the onboarding flow */}
-      {!onboardingComplete ? (
-        <div className="py-8">
-          <div className="text-center mb-8">
-            <h1 className="font-display text-3xl sm:text-4xl font-extrabold mb-2 tracking-tight text-dark">
+  if (!onboardingComplete) {
+    return (
+      <div style={{ minHeight: 'calc(100vh - 136px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
+        <div style={{ width: '100%', maxWidth: '520px' }}>
+          <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+            <h1 style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: 'clamp(28px, 5vw, 40px)', color: '#1A1A1A', letterSpacing: '-0.02em', marginBottom: '12px' }}>
               MEET YOUR WINGMAN
             </h1>
-            <p className="text-xs font-sans font-bold text-muted max-w-xs sm:max-w-sm mx-auto leading-relaxed uppercase tracking-wider">
-              Your AI companion that proactively coordinates your grooming schedule before key life milestones.
+            <p style={{ fontFamily: 'Inter', fontSize: '12px', fontWeight: 700, color: '#6B6B6B', textTransform: 'uppercase', letterSpacing: '0.08em', lineHeight: 1.7 }}>
+              Your AI companion that proactively coordinates<br />your grooming before key life milestones.
             </p>
           </div>
           <WingmanChat />
         </div>
-      ) : (
-        /* If onboarding complete, show Dashboard */
-        <>
-          {/* Emergency Alert Banner */}
-          <EmergencyBanner onTriggerEmergency={handleEmergencyTrigger} />
+      </div>
+    );
+  }
 
-          {/* Wingman Card Component (Dashboard Main advice) */}
-          <section className="space-y-4">
-            <div className="flex items-center gap-1.5 px-1 select-none">
-              <span className="inline-block font-display font-bold text-xs tracking-[0.1em] uppercase bg-yellow border-2 border-dark text-dark px-3 py-1 shadow-[2px_2px_0px_#1A1A1A]">
-                WINGMAN'S ADVICE
-              </span>
-            </div>
-            <WingmanCard onBookNow={handleBookInitiate} />
-          </section>
+  return (
+    <div style={{ maxWidth: '900px', margin: '0 auto', padding: '32px 20px 40px' }}>
 
-          {/* Marketplace Browse Section */}
-          <section className="space-y-6 pt-4">
-            <div className="flex items-center justify-between px-1">
-              <h3 className="font-display text-2xl font-extrabold text-dark tracking-tight">NAGPUR PROFESSIONALS</h3>
-              <button 
-                onClick={() => setActiveTab('browse')}
-                className="flex items-center gap-1.5 font-display font-bold text-xs border-2 border-dark bg-white hover:bg-cream text-dark px-3 py-1 shadow-[2px_2px_0px_#1A1A1A] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0 active:translate-y-0 active:shadow-none transition-all rounded-none cursor-pointer uppercase"
-              >
-                <span>SEE ALL</span>
-                <ArrowRight className="w-3.5 h-3.5" strokeWidth={2.5} />
-              </button>
-            </div>
+      {/* Emergency Banner */}
+      <EmergencyBanner onTriggerEmergency={() => setIsEmergencyOpen(true)} />
 
-            {/* Responsive listing */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {homeProfessionals.map((pro) => (
-                <div key={pro.id} className="w-full">
-                  <ProfessionalCard 
-                    professional={pro} 
-                    onBook={handleBookInitiate} 
-                    onViewProfile={setPanelPro}
-                  />
-                </div>
-              ))}
-            </div>
-          </section>
-        </>
-      )}
+      {/* Wingman Section */}
+      <div style={{ marginBottom: '48px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+          <span style={{
+            fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '11px',
+            background: '#F5C842', border: '2px solid #1A1A1A', color: '#1A1A1A',
+            padding: '4px 12px', letterSpacing: '0.08em', boxShadow: '2px 2px 0 #1A1A1A'
+          }}>
+            ✦ WINGMAN'S ADVICE
+          </span>
+        </div>
+        <WingmanCard onBookNow={handleBookInitiate} />
+      </div>
 
-      {/* Booking Flow Modal */}
-      <BookingModal 
-        professional={selectedPro}
-        isOpen={isBookingOpen}
-        onClose={() => setIsBookingOpen(false)}
-        onBookingSuccess={handleBookingConfirmed}
-      />
+      {/* Professionals Section */}
+      <div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+          <h2 style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: 'clamp(20px, 3vw, 28px)', color: '#1A1A1A', letterSpacing: '-0.02em' }}>
+            NAGPUR PROFESSIONALS
+          </h2>
+          <button onClick={() => setActiveTab('browse')} style={{
+            display: 'flex', alignItems: 'center', gap: '6px',
+            fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: '11px',
+            background: '#fff', border: '2px solid #1A1A1A', color: '#1A1A1A',
+            padding: '8px 14px', boxShadow: '3px 3px 0 #1A1A1A', cursor: 'pointer',
+            letterSpacing: '0.06em', transition: 'transform 0.12s, box-shadow 0.12s'
+          }}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'translate(-2px,-2px)'; e.currentTarget.style.boxShadow = '5px 5px 0 #1A1A1A'; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '3px 3px 0 #1A1A1A'; }}
+          >
+            SEE ALL <ArrowRight size={13} strokeWidth={2.5} />
+          </button>
+        </div>
 
-      {/* Slide-over Profile Panel */}
-      <ProfessionalPanel
-        professional={panelPro}
-        isOpen={!!panelPro}
-        onClose={() => setPanelPro(null)}
-        onBook={handleBookInitiate}
-      />
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '20px' }}>
+          {homeProfessionals.map(pro => (
+            <ProfessionalCard key={pro.id} professional={pro} onBook={handleBookInitiate} onViewProfile={setPanelPro} />
+          ))}
+        </div>
+      </div>
 
-      {/* Emergency Booking Modal */}
-      <EmergencyModal
-        isOpen={isEmergencyOpen}
-        onClose={() => setIsEmergencyOpen(false)}
-        onBookingSuccess={handleBookingConfirmed}
-      />
+      <BookingModal professional={selectedPro} isOpen={isBookingOpen} onClose={() => setIsBookingOpen(false)} onBookingSuccess={() => {}} />
+      <ProfessionalPanel professional={panelPro} isOpen={!!panelPro} onClose={() => setPanelPro(null)} onBook={handleBookInitiate} />
+      <EmergencyModal isOpen={isEmergencyOpen} onClose={() => setIsEmergencyOpen(false)} onBookingSuccess={() => {}} />
     </div>
   );
 }

@@ -24,53 +24,34 @@ const SpinnerDots = () => (
 );
 
 function AppContent() {
-  const { loading, onboardingComplete } = useAuth();
+  const { loading } = useAuth();
   const [activeTab, setActiveTab] = useState('wingman');
 
   if (loading) return <SpinnerDots />;
-
   if (window.location.pathname === '/pro-dashboard') return <ProDashboard />;
 
   return (
     <WingmanProvider>
-      <div className="page-wrapper" style={{ minHeight: '100vh', background: 'var(--bg-page)', fontFamily: 'Inter', color: 'var(--text-primary)' }}>
-        {!onboardingComplete ? (
-          <main style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
-            <div className="w-full max-w-lg">
-              <div className="text-center mb-8 select-none">
-                <h1 className="font-display text-3xl sm:text-4xl font-extrabold mb-2 tracking-tight text-dark uppercase">
-                  MEET YOUR WINGMAN
-                </h1>
-                <p className="text-xs font-sans font-bold text-muted max-w-xs sm:max-w-sm mx-auto leading-relaxed uppercase tracking-wider">
-                  Your AI companion that proactively coordinates your grooming schedule before key life milestones.
-                </p>
-              </div>
-              <WingmanChat />
-            </div>
-          </main>
-        ) : (
-          <>
-            <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
-            <main style={{ paddingTop: '72px', paddingBottom: '80px', minHeight: '100vh', maxWidth: '100%', overflowX: 'hidden' }}>
-              <AnimatePresence mode="wait">
-                <Suspense fallback={<SpinnerDots />}>
-                  <motion.div
-                    key={activeTab}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.18 }}
-                  >
-                    {activeTab === 'wingman'  && <Home setActiveTab={setActiveTab} />}
-                    {activeTab === 'browse'   && <Browse />}
-                    {activeTab === 'bookings' && <Bookings setActiveTab={setActiveTab} />}
-                    {activeTab === 'profile'  && <Profile />}
-                  </motion.div>
-                </Suspense>
-              </AnimatePresence>
-            </main>
-          </>
-        )}
+      <div style={{ minHeight: '100vh', background: 'var(--bg-page)', fontFamily: 'Inter', color: 'var(--text-primary)' }}>
+        <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
+        <main style={{ paddingTop: '68px', paddingBottom: '68px', minHeight: '100vh' }}>
+          <AnimatePresence mode="wait">
+            <Suspense fallback={<SpinnerDots />}>
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.18 }}
+              >
+                {activeTab === 'wingman'  && <Home setActiveTab={setActiveTab} />}
+                {activeTab === 'browse'   && <Browse />}
+                {activeTab === 'bookings' && <Bookings setActiveTab={setActiveTab} />}
+                {activeTab === 'profile'  && <Profile />}
+              </motion.div>
+            </Suspense>
+          </AnimatePresence>
+        </main>
       </div>
     </WingmanProvider>
   );

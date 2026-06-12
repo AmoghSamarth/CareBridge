@@ -1,362 +1,178 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import ConfidenceRating from '../components/ConfidenceRating';
-import { Calendar, Clock, MapPin, Sparkles, CheckCircle2, AlertCircle, Trash2, ArrowRight } from 'lucide-react';
+import { Clock, MapPin, Sparkles, AlertCircle, ArrowRight } from 'lucide-react';
 import { db, isFirebaseInitialized } from '../lib/firebase';
 import { collection, query, where, onSnapshot, doc, updateDoc } from 'firebase/firestore';
 
+const pill = (bg, text, children) => ({
+  display: 'inline-block', background: bg, color: text,
+  border: '1.5px solid #1A1A1A', padding: '2px 10px',
+  fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: '10px',
+  textTransform: 'uppercase', letterSpacing: '0.05em',
+  boxShadow: '1.5px 1.5px 0 #1A1A1A'
+});
+
 export default function Bookings({ setActiveTab }) {
   const { user } = useAuth();
-  const [activeTab, setActiveTabState] = useState('upcoming'); // upcoming | past
+  const [activeTab, setActiveTabState] = useState('upcoming');
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [cancelConfirmId, setCancelConfirmId] = useState(null);
 
   useEffect(() => {
     if (!user) return;
-
     let unsubscribe = () => {};
-
     if (isFirebaseInitialized && db) {
       const q = query(collection(db, 'bookings'), where('user_id', '==', user.uid));
-      unsubscribe = onSnapshot(q, (snapshot) => {
-        const list = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-          booking_date: doc.data().booking_date || doc.data().bookingDate,
-          professional_name: doc.data().professional_name || doc.data().professionalName,
-          is_emergency: doc.data().is_emergency ?? doc.data().isEmergency,
-          wingman_recommended: doc.data().wingman_recommended ?? doc.data().wingmanRecommended
-        }));
-        setBookings(list);
-        setLoading(false);
-      }, (error) => {
-        console.error("Firestore onSnapshot failed, using local storage fallback:", error);
-        loadLocalBookings();
-      });
-    } else {
-      loadLocalBookings();
-    }
-
+      unsubscribe = onSnapshot(q, snapshot => {
+        const list = snapshot.docs.map(d => ({ id: d.id, ...d.data(), booking_date: d.data().booking_date || d.data().bookingDate, professional_name: d.data().professional_name || d.data().professionalName, is_emergency: d.data().is_emergency ?? d.data().isEmergency, wingman_recommended: d.data().wingman_recommended ?? d.data().wingmanRecommended }));
+        setBookings(list); setLoading(false);
+      }, () => loadLocalBookings());
+    } else { loadLocalBookings(); }
     return () => unsubscribe();
   }, [user]);
 
   const loadLocalBookings = () => {
     const key = `carebridge_bookings_${user.uid}`;
     const saved = localStorage.getItem(key);
-    if (saved) {
-      try {
-        setBookings(JSON.parse(saved));
-      } catch {
-        setBookings([]);
-      }
-    } else {
-      const defaultBookings = [
-        {
-          id: 'demo-book-1',
-          professional_name: 'Mohit Thakur',
-          service: 'haircut',
-          booking_date: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(),
-          slot: '5:00 PM',
-          status: 'completed',
-          area: 'Sadar',
-          is_emergency: false,
-          confidence_score: 0,
-          wingman_recommended: true
-        }
-      ];
-      localStorage.setItem(key, JSON.stringify(defaultBookings));
-      setBookings(defaultBookings);
+    if (saved) { try { setBookings(JSON.parse(saved)); } catch { setBookings([]); } }
+    else {
+      const defaults = [{ id: 'demo-book-1', professional_name: 'Mohit Thakur', service: 'haircut', booking_date: new Date(Date.now() - 4*24*60*60*1000).toISOString(), slot: '5:00 PM', status: 'completed', area: 'Sadar', is_emergency: false, confidence_score: 0, wingman_recommended: true }];
+      localStorage.setItem(key, JSON.stringify(defaults)); setBookings(defaults);
     }
     setLoading(false);
   };
 
-  const handleCancelBooking = async (bookingId) => {
-    // 1. Local storage fallback
+  const updateBooking = async (id, data) => {
     const key = `carebridge_bookings_${user.uid}`;
-    let list = [];
-    try {
-      list = JSON.parse(localStorage.getItem(key)) || [];
-    } catch {
-      list = [];
-    }
-    const updated = list.map(b => b.id === bookingId ? { ...b, status: 'cancelled' } : b);
-    localStorage.setItem(key, JSON.stringify(updated));
-    setBookings(updated);
-
-    // 2. Firestore Sync
-    if (isFirebaseInitialized && db) {
-      try {
-        await updateDoc(doc(db, 'bookings', bookingId), { status: 'cancelled' });
-      } catch (err) {
-        console.error("Failed to cancel in Firestore:", err);
-      }
-    }
-
-    // 3. API Sync
-    try {
-      await fetch(`/api/bookings/${bookingId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'cancelled' })
-      });
-    } catch (err) {
-      console.warn("API cancel patch failed:", err);
-    }
-    setCancelConfirmId(null);
+    let list = []; try { list = JSON.parse(localStorage.getItem(key)) || []; } catch {}
+    const updated = list.map(b => b.id === id ? { ...b, ...data } : b);
+    localStorage.setItem(key, JSON.stringify(updated)); setBookings(updated);
+    if (isFirebaseInitialized && db) { try { await updateDoc(doc(db, 'bookings', id), data); } catch {} }
+    try { await fetch(`/api/bookings/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); } catch {}
   };
 
-  const handleCompleteBooking = async (bookingId) => {
-    const key = `carebridge_bookings_${user.uid}`;
-    let list = [];
-    try {
-      list = JSON.parse(localStorage.getItem(key)) || [];
-    } catch {
-      list = [];
-    }
-    const updated = list.map(b => b.id === bookingId ? { ...b, status: 'completed' } : b);
-    localStorage.setItem(key, JSON.stringify(updated));
-    setBookings(updated);
+  const upcoming = bookings.filter(b => b.status === 'confirmed' || b.status === 'pending');
+  const past = bookings.filter(b => b.status === 'completed' || b.status === 'cancelled');
 
-    if (isFirebaseInitialized && db) {
-      try {
-        await updateDoc(doc(db, 'bookings', bookingId), { status: 'completed' });
-      } catch (err) {
-        console.error("Failed to complete in Firestore:", err);
-      }
-    }
-
-    try {
-      await fetch(`/api/bookings/${bookingId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'completed' })
-      });
-    } catch (err) {
-      console.warn("API complete patch failed:", err);
-    }
-  };
-
-  const handleConfidenceSubmitted = async (bookingId, score) => {
-    const key = `carebridge_bookings_${user.uid}`;
-    let list = [];
-    try {
-      list = JSON.parse(localStorage.getItem(key)) || [];
-    } catch {
-      list = [];
-    }
-    const updated = list.map(b => b.id === bookingId ? { ...b, confidence_score: score } : b);
-    localStorage.setItem(key, JSON.stringify(updated));
-    setBookings(updated);
-
-    if (isFirebaseInitialized && db) {
-      try {
-        await updateDoc(doc(db, 'bookings', bookingId), { confidence_score: score });
-      } catch (err) {
-        console.error("Failed to save confidence score in Firestore:", err);
-      }
-    }
-
-    try {
-      await fetch(`/api/bookings/${bookingId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ confidence_score: score })
-      });
-    } catch (err) {
-      console.warn("API rating patch failed:", err);
-    }
-  };
-
-  const upcomingBookings = bookings.filter(b => b.status === 'confirmed' || b.status === 'pending');
-  const pastBookings = bookings.filter(b => b.status === 'completed' || b.status === 'cancelled');
+  const tabBtn = (id, label, count) => (
+    <button onClick={() => setActiveTabState(id)} style={{
+      flex: 1, padding: '14px', background: activeTab === id ? '#F5C842' : '#fff',
+      border: 'none', borderRight: id === 'upcoming' ? '2.5px solid #1A1A1A' : 'none',
+      fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '12px',
+      textTransform: 'uppercase', letterSpacing: '0.06em', color: '#1A1A1A',
+      cursor: 'pointer', transition: 'background 0.15s'
+    }}>
+      {label} ({count})
+    </button>
+  );
 
   return (
-    <div className="pb-28 pt-20 px-4 max-w-2xl mx-auto space-y-6">
-      
-      {/* Title */}
-      <div className="select-none">
-        <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-dark">YOUR APPOINTMENTS</h1>
-        <p className="text-xs font-sans font-bold text-muted mt-1 uppercase tracking-tight">Track scheduled styling visits or review confidence feedback on past bookings.</p>
+    <div style={{ maxWidth: '680px', margin: '0 auto', padding: '32px 20px 40px' }}>
+
+      {/* Header */}
+      <div style={{ marginBottom: '28px' }}>
+        <h1 style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: 'clamp(24px, 4vw, 32px)', color: '#1A1A1A', letterSpacing: '-0.02em', marginBottom: '6px' }}>
+          YOUR APPOINTMENTS
+        </h1>
+        <p style={{ fontFamily: 'Inter', fontSize: '12px', fontWeight: 600, color: '#6B6B6B', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+          Track visits · Rate confidence · Let Wingman learn
+        </p>
       </div>
 
       {/* Tabs */}
-      <div className="flex border-3 border-dark bg-white shadow-brutal rounded-none overflow-hidden select-none">
-        <button
-          onClick={() => setActiveTabState('upcoming')}
-          className={`flex-1 py-3 text-center font-display font-bold text-xs tracking-wider cursor-pointer border-r-3 border-dark transition-colors uppercase ${
-            activeTab === 'upcoming' ? 'bg-yellow text-dark font-extrabold' : 'bg-white text-dark hover:bg-cream'
-          }`}
-        >
-          Upcoming ({upcomingBookings.length})
-        </button>
-        <button
-          onClick={() => setActiveTabState('past')}
-          className={`flex-1 py-3 text-center font-display font-bold text-xs tracking-wider cursor-pointer transition-colors uppercase ${
-            activeTab === 'past' ? 'bg-yellow text-dark font-extrabold' : 'bg-white text-dark hover:bg-cream'
-          }`}
-        >
-          Past History ({pastBookings.length})
-        </button>
+      <div style={{ display: 'flex', border: '2.5px solid #1A1A1A', boxShadow: '5px 5px 0 #1A1A1A', marginBottom: '24px', background: '#fff' }}>
+        {tabBtn('upcoming', 'Upcoming', upcoming.length)}
+        {tabBtn('past', 'Past History', past.length)}
       </div>
 
       {loading ? (
-        <div className="text-center py-12">
-          <span className="w-3 h-3 bg-dark rounded-full animate-ping inline-block" />
-          <p className="text-xs font-display font-bold text-dark mt-2 uppercase">Syncing bookings...</p>
+        <div style={{ textAlign: 'center', padding: '48px' }}>
+          <p style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: '12px', color: '#6B6B6B', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Syncing bookings...</p>
         </div>
       ) : (
-        <div>
-          {/* Upcoming Tab Content */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           {activeTab === 'upcoming' && (
-            <div className="space-y-4">
-              {upcomingBookings.length > 0 ? (
-                upcomingBookings.map((b) => (
-                  <div 
-                    key={b.id} 
-                    className="bg-white border-3 border-dark p-5 shadow-brutal flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-brutal-hover transition-all rounded-none"
-                  >
-                    <div className="space-y-2">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-[10px] font-display font-bold text-dark bg-yellow border border-dark px-1.5 py-0.5 rounded-none uppercase">
-                          {b.service}
-                        </span>
-                        {b.is_emergency && (
-                          <span className="bg-coral border-2 border-dark text-dark text-[9px] font-display font-bold px-2 py-0.5 rounded-none shadow-[1.5px_1.5px_0px_#1A1A1A] uppercase">
-                            Emergency
-                          </span>
-                        )}
-                        {b.wingman_recommended && (
-                          <span className="bg-teal border-2 border-dark text-dark text-[9px] font-display font-bold px-2 py-0.5 rounded-none shadow-[1.5px_1.5px_0px_#1A1A1A] flex items-center gap-0.5">
-                            <Sparkles className="w-2.5 h-2.5 text-dark" strokeWidth={2.5} /> Match
-                          </span>
-                        )}
-                      </div>
-                      <h4 className="font-display font-extrabold text-base text-dark">{b.professional_name.toUpperCase()}</h4>
-                      
-                      <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-dark/70 font-sans font-bold uppercase">
-                        <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5 text-dark" strokeWidth={2.5} /> {new Date(b.booking_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} AT {b.slot}</span>
-                        <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5 text-dark" strokeWidth={2.5} /> {b.area || 'Nagpur'}</span>
-                      </div>
-                    </div>
-
-                    <div className="flex sm:flex-col gap-2 w-full sm:w-auto self-stretch sm:self-auto shrink-0 justify-end">
-                      {cancelConfirmId === b.id ? (
-                        <div className="flex items-center gap-2 w-full justify-end">
-                          <span className="text-[10px] font-display font-bold text-coral uppercase">Sure?</span>
-                          <button
-                            onClick={() => handleCancelBooking(b.id)}
-                            className="bg-coral border-2 border-dark text-dark font-display font-bold text-[10px] py-1 px-3 shadow-[1.5px_1.5px_0px_#1A1A1A] rounded-none cursor-pointer uppercase"
-                          >
-                            Yes
-                          </button>
-                          <button
-                            onClick={() => setCancelConfirmId(null)}
-                            className="bg-white border-2 border-dark text-dark font-display font-bold text-[10px] py-1 px-3 shadow-[1.5px_1.5px_0px_#1A1A1A] rounded-none cursor-pointer uppercase"
-                          >
-                            No
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="flex gap-2 w-full justify-end">
-                          <button
-                            onClick={() => setCancelConfirmId(b.id)}
-                            className="bg-white border-2 border-dark text-dark font-display font-bold text-[10px] py-2 px-3.5 shadow-[2px_2px_0px_#1A1A1A] hover:-translate-x-[1px] hover:-translate-y-[1px] active:translate-x-0 active:translate-y-0 transition-all rounded-none cursor-pointer uppercase"
-                          >
-                            Cancel
-                          </button>
-                          <button
-                            onClick={() => handleCompleteBooking(b.id)}
-                            className="bg-teal border-2 border-dark text-dark font-display font-bold text-[10px] py-2 px-4 shadow-[2px_2px_0px_#1A1A1A] hover:-translate-x-[1px] hover:-translate-y-[1px] active:translate-x-0 active:translate-y-0 transition-all rounded-none cursor-pointer uppercase"
-                          >
-                            Complete
-                          </button>
-                        </div>
-                      )}
-                    </div>
+            upcoming.length > 0 ? upcoming.map(b => (
+              <div key={b.id} style={{ background: '#fff', border: '2.5px solid #1A1A1A', padding: '20px 24px', boxShadow: '5px 5px 0 #1A1A1A', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+                    <span style={pill('#F5C842', '#1A1A1A')}>{b.service}</span>
+                    {b.is_emergency && <span style={pill('#FF6B35', '#1A1A1A')}>Emergency</span>}
+                    {b.wingman_recommended && <span style={pill('#2EC4B6', '#1A1A1A')}>✦ Wingman Pick</span>}
                   </div>
-                ))
-              ) : (
-                <div className="bg-white border-3 border-dark p-8 text-center text-dark font-sans font-bold text-xs space-y-4 shadow-brutal rounded-none select-none">
-                  <AlertCircle className="w-8 h-8 text-dark/60 mx-auto" strokeWidth={2.5} />
-                  <div className="space-y-1">
-                    <p className="uppercase text-sm font-display font-extrabold">No upcoming visits scheduled</p>
-                    <p className="text-[10px] text-muted uppercase">Book Nagpur styling professionals via the marketplace or consult Wingman.</p>
+                  <h4 style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '16px', color: '#1A1A1A', margin: 0 }}>
+                    {b.professional_name.toUpperCase()}
+                  </h4>
+                  <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+                    <span style={{ fontFamily: 'Inter', fontSize: '12px', fontWeight: 600, color: '#6B6B6B', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <Clock size={13} strokeWidth={2.5} /> {new Date(b.booking_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} · {b.slot}
+                    </span>
+                    <span style={{ fontFamily: 'Inter', fontSize: '12px', fontWeight: 600, color: '#6B6B6B', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <MapPin size={13} strokeWidth={2.5} /> {b.area || 'Nagpur'}
+                    </span>
                   </div>
-                  {setActiveTab && (
-                    <button
-                      onClick={() => setActiveTab('browse')}
-                      className="inline-flex items-center gap-1.5 bg-yellow border-2 border-dark text-dark font-display font-bold text-xs py-2 px-4 shadow-[2px_2px_0px_#1A1A1A] hover:-translate-x-0.5 hover:-translate-y-0.5 active:translate-x-0 active:translate-y-0 transition-all rounded-none cursor-pointer uppercase"
-                    >
-                      <span>Browse Stylists</span> <ArrowRight className="w-3.5 h-3.5" strokeWidth={2.5} />
-                    </button>
+                </div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  {cancelConfirmId === b.id ? (
+                    <>
+                      <span style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: '11px', color: '#FF6B35', alignSelf: 'center' }}>Sure?</span>
+                      <button onClick={() => { updateBooking(b.id, { status: 'cancelled' }); setCancelConfirmId(null); }} style={{ background: '#FF6B35', border: '2px solid #1A1A1A', color: '#1A1A1A', padding: '8px 14px', fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: '11px', cursor: 'pointer', boxShadow: '2px 2px 0 #1A1A1A' }}>YES</button>
+                      <button onClick={() => setCancelConfirmId(null)} style={{ background: '#fff', border: '2px solid #1A1A1A', color: '#1A1A1A', padding: '8px 14px', fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: '11px', cursor: 'pointer', boxShadow: '2px 2px 0 #1A1A1A' }}>NO</button>
+                    </>
+                  ) : (
+                    <>
+                      <button onClick={() => setCancelConfirmId(b.id)} style={{ background: '#fff', border: '2px solid #1A1A1A', color: '#1A1A1A', padding: '8px 14px', fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: '11px', cursor: 'pointer', boxShadow: '2px 2px 0 #1A1A1A' }}>CANCEL</button>
+                      <button onClick={() => updateBooking(b.id, { status: 'completed' })} style={{ background: '#2EC4B6', border: '2px solid #1A1A1A', color: '#1A1A1A', padding: '8px 14px', fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: '11px', cursor: 'pointer', boxShadow: '2px 2px 0 #1A1A1A' }}>COMPLETE</button>
+                    </>
                   )}
                 </div>
-              )}
-            </div>
+              </div>
+            )) : (
+              <div style={{ background: '#fff', border: '2.5px solid #1A1A1A', padding: '48px 24px', textAlign: 'center', boxShadow: '5px 5px 0 #1A1A1A' }}>
+                <AlertCircle size={32} strokeWidth={2} style={{ color: '#6B6B6B', marginBottom: '16px' }} />
+                <p style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '14px', color: '#1A1A1A', textTransform: 'uppercase', marginBottom: '8px' }}>No upcoming visits</p>
+                <p style={{ fontFamily: 'Inter', fontSize: '12px', color: '#6B6B6B', marginBottom: '20px' }}>Book a professional or ask Wingman for a recommendation.</p>
+                {setActiveTab && (
+                  <button onClick={() => setActiveTab('browse')} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: '#F5C842', border: '2px solid #1A1A1A', color: '#1A1A1A', padding: '10px 20px', fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: '11px', cursor: 'pointer', boxShadow: '3px 3px 0 #1A1A1A' }}>
+                    BROWSE STYLISTS <ArrowRight size={13} strokeWidth={2.5} />
+                  </button>
+                )}
+              </div>
+            )
           )}
 
-          {/* Past Tab Content */}
           {activeTab === 'past' && (
-            <div className="space-y-4">
-              {pastBookings.length > 0 ? (
-                pastBookings.map((b) => (
-                  <div 
-                    key={b.id} 
-                    className="bg-white border-3 border-dark p-5 shadow-brutal space-y-4 rounded-none hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-brutal-hover transition-all duration-150"
-                  >
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-[10px] text-dark font-display font-bold bg-pink border border-dark px-1.5 py-0.5 rounded-none uppercase">
-                            {b.service}
-                          </span>
-                          
-                          {/* Green (Teal) for Completed, Red (Coral) for Cancelled */}
-                          {b.status === 'completed' ? (
-                            <span className="inline-block text-[9px] text-dark font-display font-bold bg-teal border border-dark px-1.5 py-0.5 rounded-none uppercase">
-                              Completed
-                            </span>
-                          ) : (
-                            <span className="inline-block text-[9px] text-dark font-display font-bold bg-coral border border-dark px-1.5 py-0.5 rounded-none uppercase">
-                              Cancelled
-                            </span>
-                          )}
-                        </div>
-
-                        <h4 className="font-display font-extrabold text-sm text-dark mt-1">{b.professional_name.toUpperCase()}</h4>
-                        <p className="text-[10px] font-sans font-bold text-dark/70 uppercase mt-1">
-                          {new Date(b.booking_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} AT {b.slot}
-                        </p>
-                      </div>
-
-                      {b.confidence_score > 0 && (
-                        <div className="flex items-center gap-1 bg-yellow border-2 border-dark px-2 py-0.5 text-dark text-[10px] font-display font-bold shadow-[2px_2px_0px_#1A1A1A] rounded-none">
-                           <Sparkles className="w-3.5 h-3.5 text-dark animate-pulse" strokeWidth={2.5} />
-                           <span>SCORE: {b.confidence_score}/5</span>
-                        </div>
-                      )}
+            past.length > 0 ? past.map(b => (
+              <div key={b.id} style={{ background: '#fff', border: '2.5px solid #1A1A1A', padding: '20px 24px', boxShadow: '5px 5px 0 #1A1A1A' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                      <span style={pill('#F03E7A', '#fff')}>{b.service}</span>
+                      <span style={pill(b.status === 'completed' ? '#2EC4B6' : '#FF6B35', '#1A1A1A')}>{b.status}</span>
                     </div>
-
-                    {/* Show confidence score picker if completed and not yet rated */}
-                    {b.status === 'completed' && b.confidence_score === 0 && (
-                      <div className="pt-4 border-t-2 border-dark border-dashed">
-                        <ConfidenceRating 
-                          bookingId={b.id} 
-                          proName={b.professional_name} 
-                          service={b.service}
-                          onRateSubmitted={(score) => handleConfidenceSubmitted(b.id, score)} 
-                        />
-                      </div>
-                    )}
+                    <h4 style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '15px', color: '#1A1A1A', margin: 0 }}>{b.professional_name.toUpperCase()}</h4>
+                    <p style={{ fontFamily: 'Inter', fontSize: '12px', color: '#6B6B6B', margin: 0 }}>{new Date(b.booking_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} · {b.slot}</p>
                   </div>
-                ))
-              ) : (
-                <div className="bg-white border-3 border-dark p-6 text-center text-dark font-sans font-bold text-xs shadow-brutal rounded-none uppercase">
-                  No completed styling history found.
+                  {b.confidence_score > 0 && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#F5C842', border: '2px solid #1A1A1A', padding: '4px 12px', boxShadow: '2px 2px 0 #1A1A1A' }}>
+                      <Sparkles size={13} strokeWidth={2.5} />
+                      <span style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: '11px' }}>{b.confidence_score}/5</span>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
+                {b.status === 'completed' && b.confidence_score === 0 && (
+                  <div style={{ borderTop: '2px dashed #1A1A1A', paddingTop: '16px', marginTop: '8px' }}>
+                    <ConfidenceRating bookingId={b.id} proName={b.professional_name} service={b.service} onRateSubmitted={score => updateBooking(b.id, { confidence_score: score })} />
+                  </div>
+                )}
+              </div>
+            )) : (
+              <div style={{ background: '#fff', border: '2.5px solid #1A1A1A', padding: '48px 24px', textAlign: 'center', boxShadow: '5px 5px 0 #1A1A1A' }}>
+                <p style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: '13px', color: '#6B6B6B', textTransform: 'uppercase' }}>No completed bookings yet.</p>
+              </div>
+            )
           )}
         </div>
       )}

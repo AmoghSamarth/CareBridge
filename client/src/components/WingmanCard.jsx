@@ -41,8 +41,8 @@ export default function WingmanCard({ onBookNow }) {
       style={{
         width: '100%',
         background: '#F5C842',
-        border: '3px solid #1A1A1A',
-        boxShadow: '8px 8px 0 #1A1A1A',
+        border: '3px solid var(--border)',
+        boxShadow: '8px 8px 0 var(--shadow)',
         overflow: 'hidden',
       }}
     >
@@ -95,10 +95,10 @@ export default function WingmanCard({ onBookNow }) {
       </div>
 
       {/* Recommendation card */}
-      <div style={{ margin: '0 20px 20px', background: '#fff', border: '2.5px solid #1A1A1A', boxShadow: '4px 4px 0 #1A1A1A', padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
+      <div style={{ margin: '0 20px 20px', background: 'var(--bg-card)', border: '2.5px solid var(--border)', boxShadow: '4px 4px 0 var(--shadow)', padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
           <img src={mockPro.image_url} alt={mockPro.name}
-            style={{ width: '52px', height: '52px', border: '2.5px solid #1A1A1A', objectFit: 'cover', flexShrink: 0, borderRadius: '12px', boxShadow: '3px 3px 0 #1A1A1A' }}
+            style={{ width: '52px', height: '52px', border: '2.5px solid var(--border)', objectFit: 'cover', flexShrink: 0, borderRadius: '12px', boxShadow: '3px 3px 0 var(--shadow)' }}
           />
           <div>
             <span style={{
@@ -109,10 +109,10 @@ export default function WingmanCard({ onBookNow }) {
             }}>
               ✦ RECOMMENDED
             </span>
-            <p style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '15px', color: '#1A1A1A', margin: 0 }}>
+            <p style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '15px', color: 'var(--text-primary)', margin: 0 }}>
               {mockPro.name}
             </p>
-            <p style={{ fontFamily: 'Inter', fontSize: '12px', color: '#6B6B6B', margin: '2px 0 0', fontWeight: 600 }}>
+            <p style={{ fontFamily: 'Inter', fontSize: '12px', color: 'var(--text-muted)', margin: '2px 0 0', fontWeight: 600 }}>
               {mockPro.area} · ⭐ {mockPro.rating}
             </p>
           </div>
@@ -122,15 +122,15 @@ export default function WingmanCard({ onBookNow }) {
           style={{
             fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '12px',
             color: '#fff', background: '#F03E7A',
-            border: '2.5px solid #1A1A1A',
-            boxShadow: '4px 4px 0 #1A1A1A',
+            border: '2.5px solid var(--border)',
+            boxShadow: '4px 4px 0 var(--shadow)',
             padding: '12px 22px', cursor: 'pointer',
             letterSpacing: '0.06em',
             transition: 'transform 0.12s, box-shadow 0.12s',
             whiteSpace: 'nowrap', flexShrink: 0,
           }}
-          onMouseEnter={e => { e.currentTarget.style.transform = 'translate(-2px,-2px)'; e.currentTarget.style.boxShadow = '6px 6px 0 #1A1A1A'; }}
-          onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '4px 4px 0 #1A1A1A'; }}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'translate(-2px,-2px)'; e.currentTarget.style.boxShadow = '6px 6px 0 var(--shadow)'; }}
+          onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '4px 4px 0 var(--shadow)'; }}
         >
           BOOK NOW
         </button>

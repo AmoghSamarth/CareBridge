@@ -5,17 +5,17 @@ export default function EmergencyBanner({ onTriggerEmergency }) {
   return (
     <div style={{
       width: '100%', background: '#FF6B35',
-      border: '2.5px solid #1A1A1A', boxShadow: '5px 5px 0 #1A1A1A',
+      border: '2.5px solid var(--border)', boxShadow: '5px 5px 0 var(--shadow)',
       padding: '14px 20px', marginBottom: '24px',
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       gap: '16px', flexWrap: 'wrap',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         <div style={{
-          width: '36px', height: '36px', background: '#fff',
-          border: '2px solid #1A1A1A', display: 'flex',
+          width: '36px', height: '36px', background: 'var(--bg-card)',
+          border: '2px solid var(--border)', display: 'flex',
           alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-          boxShadow: '2px 2px 0 #1A1A1A',
+          boxShadow: '2px 2px 0 var(--shadow)',
         }}>
           <ShieldAlert size={18} strokeWidth={2.5} color="#1A1A1A" />
         </div>
@@ -32,15 +32,15 @@ export default function EmergencyBanner({ onTriggerEmergency }) {
       <button onClick={onTriggerEmergency}
         style={{
           display: 'flex', alignItems: 'center', gap: '6px',
-          background: '#F5C842', border: '2.5px solid #1A1A1A',
+          background: '#F5C842', border: '2.5px solid var(--border)',
           color: '#1A1A1A', padding: '10px 18px',
           fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '11px',
           letterSpacing: '0.06em', textTransform: 'uppercase',
-          cursor: 'pointer', boxShadow: '3px 3px 0 #1A1A1A',
+          cursor: 'pointer', boxShadow: '3px 3px 0 var(--shadow)',
           transition: 'transform 0.12s, box-shadow 0.12s', flexShrink: 0,
         }}
-        onMouseEnter={e => { e.currentTarget.style.transform = 'translate(-2px,-2px)'; e.currentTarget.style.boxShadow = '5px 5px 0 #1A1A1A'; }}
-        onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '3px 3px 0 #1A1A1A'; }}
+        onMouseEnter={e => { e.currentTarget.style.transform = 'translate(-2px,-2px)'; e.currentTarget.style.boxShadow = '5px 5px 0 var(--shadow)'; }}
+        onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '3px 3px 0 var(--shadow)'; }}
       >
         REQUEST NOW <ArrowRight size={13} strokeWidth={2.5} />
       </button>

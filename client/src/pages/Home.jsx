@@ -66,7 +66,7 @@ export default function Home({ setActiveTab }) {
       <div style={{ minHeight: 'calc(100vh - 136px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
         <div style={{ width: '100%', maxWidth: '520px' }}>
           <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-            <h1 style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: 'clamp(28px, 5vw, 40px)', color: '#1A1A1A', letterSpacing: '-0.02em', marginBottom: '12px' }}>
+            <h1 style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: 'clamp(28px, 5vw, 40px)', color: 'var(--text-primary)', letterSpacing: '-0.02em', marginBottom: '12px' }}>
               MEET YOUR WINGMAN
             </h1>
             <p style={{ fontFamily: 'Inter', fontSize: '12px', fontWeight: 700, color: '#6B6B6B', textTransform: 'uppercase', letterSpacing: '0.08em', lineHeight: 1.7 }}>
@@ -102,18 +102,18 @@ export default function Home({ setActiveTab }) {
       {/* Professionals Section */}
       <div>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-          <h2 style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: 'clamp(20px, 3vw, 28px)', color: '#1A1A1A', letterSpacing: '-0.02em' }}>
+          <h2 style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: 'clamp(20px, 3vw, 28px)', color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
             NAGPUR PROFESSIONALS
           </h2>
           <button onClick={() => setActiveTab('browse')} style={{
             display: 'flex', alignItems: 'center', gap: '6px',
             fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: '11px',
-            background: '#fff', border: '2px solid #1A1A1A', color: '#1A1A1A',
+            background: 'var(--bg-card)', border: '2px solid var(--border)', color: 'var(--text-primary)',
             padding: '8px 14px', boxShadow: '3px 3px 0 var(--shadow)', cursor: 'pointer',
             letterSpacing: '0.06em', transition: 'transform 0.12s, box-shadow 0.12s'
           }}
-            onMouseEnter={e => { e.currentTarget.style.transform = 'translate(-2px,-2px)'; e.currentTarget.style.boxShadow = '5px 5px 0 #1A1A1A'; }}
-            onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '3px 3px 0 #1A1A1A'; }}
+            onMouseEnter={e => { e.currentTarget.style.transform = 'translate(-2px,-2px)'; e.currentTarget.style.boxShadow = '5px 5px 0 var(--shadow)'; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '3px 3px 0 var(--shadow)'; }}
           >
             SEE ALL <ArrowRight size={13} strokeWidth={2.5} />
           </button>

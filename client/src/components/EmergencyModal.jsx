@@ -219,25 +219,28 @@ export default function EmergencyModal({ isOpen, onClose, onBookingSuccess }) {
                         <p className="text-[10px] font-sans font-bold text-muted uppercase">What service do you need immediately?</p>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-2 gap-3">
                         {services.map((svc) => {
                           const isSelected = selectedService === svc;
                           return (
-                            <button
+                            <motion.button
                               key={svc}
                               type="button"
+                              whileTap={{ scale: 0.96 }}
+                              animate={isSelected ? { scale: 1.05 } : { scale: 1 }}
+                              transition={{ duration: 0.15 }}
                               onClick={() => {
                                 setSelectedService(svc);
-                                setStep(2);
+                                setTimeout(() => setStep(2), 180);
                               }}
-                              className={`py-3 px-4 border-2 border-dark font-display font-bold text-xs text-left transition-all rounded-none cursor-pointer uppercase ${
+                              className={`py-4 px-4 border-[2.5px] border-dark font-display font-extrabold text-sm text-center transition-colors cursor-pointer uppercase ${
                                 isSelected
-                                  ? 'bg-yellow text-dark shadow-[2px_2px_0px_#1A1A1A]'
-                                  : 'bg-white text-dark hover:bg-cream shadow-[1px_1px_0px_#1A1A1A]'
+                                  ? 'bg-yellow text-dark shadow-[4px_4px_0px_#1A1A1A]'
+                                  : 'bg-white text-dark hover:bg-cream shadow-[2px_2px_0px_#1A1A1A] hover:shadow-[3px_3px_0px_#1A1A1A]'
                               }`}
                             >
-                              {svc}
-                            </button>
+                              {isSelected && '✓ '}{svc}
+                            </motion.button>
                           );
                         })}
                       </div>

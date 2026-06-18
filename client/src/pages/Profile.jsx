@@ -56,6 +56,9 @@ export default function Profile() {
   const [newEvent, setNewEvent] = useState({ eventType: 'Interview', eventDate: '' });
   const [confidenceBookings, setConfidenceBookings] = useState([]);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [pendingRatings, setPendingRatings] = useState({});
+  const [confidenceInsights, setConfidenceInsights] = useState({});
+  const [ratingLoading, setRatingLoading] = useState({});
   const todayStr = new Date().toISOString().split('T')[0];
   const eventEmojis = { Interview: '💼', Wedding: '💒', Party: '🎉', Festival: '🎆', 'Date Night': '💖', Other: '📅' };
 
@@ -82,9 +85,9 @@ export default function Profile() {
     if (!user) return;
     const local = localStorage.getItem(`carebridge_bookings_${user.uid}`) || '[]';
     const list = JSON.parse(local);
-    const scored = list.filter(b => b.confidence_score !== undefined || b.confidenceScore !== undefined);
-    scored.sort((a, b) => new Date(b.date || b.created_at) - new Date(a.date || a.created_at));
-    setConfidenceBookings(scored.slice(0, 5));
+    // Show bookings that have a score AND bookings that don't (for interactive rating)
+    const sorted = [...list].sort((a, b) => new Date(b.date || b.created_at) - new Date(a.date || a.created_at));
+    setConfidenceBookings(sorted.slice(0, 6));
   }, [user]);
 
   const saveField = async (field, value) => {
@@ -119,6 +122,46 @@ export default function Profile() {
     resetOnboarding();
     if (isFirebaseInitialized && db && user) { try { await setDoc(doc(db, 'users', user.uid), { onboarding_complete: false }, { merge: true }); } catch {} }
     window.location.reload();
+  };
+
+  const rateBooking = async (booking, stars) => {
+    if (!user) return;
+    setRatingLoading(prev => ({ ...prev, [booking.id]: true }));
+
+    // Persist score locally
+    const local = localStorage.getItem(`carebridge_bookings_${user.uid}`) || '[]';
+    const list = JSON.parse(local);
+    const updated = list.map(b => b.id === booking.id ? { ...b, confidence_score: stars } : b);
+    localStorage.setItem(`carebridge_bookings_${user.uid}`, JSON.stringify(updated));
+    setConfidenceBookings(updated.slice(0, 6));
+
+    // Call confidence-learn API
+    try {
+      const res = await fetch('/api/wingman/confidence-learn', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: user.uid,
+          bookingId: booking.id,
+          confidenceScore: stars,
+          professionalId: booking.professionalId || booking.professional_id,
+          service: booking.service || booking.serviceName
+        })
+      });
+      const data = await res.json();
+      if (data.success && data.insight) {
+        setConfidenceInsights(prev => ({ ...prev, [booking.id]: data.insight }));
+      }
+    } catch {
+      // Offline fallback insight
+      const proName = booking.professionalName || booking.professional_name || 'your groomer';
+      setConfidenceInsights(prev => ({
+        ...prev,
+        [booking.id]: `${stars >= 4 ? 'Great choice!' : 'Got it.'} Your ${stars}-star rating for ${proName} helps me refine your future recommendations.`
+      }));
+    } finally {
+      setRatingLoading(prev => ({ ...prev, [booking.id]: false }));
+    }
   };
 
   const signOut = async () => { await logout(); window.location.href = getLandingUrl(); };
@@ -227,21 +270,61 @@ export default function Profile() {
       <section>
         <div style={{ marginBottom: '16px' }}>
           <h3 style={S.sectionTitle}><Sparkles size={18} strokeWidth={2.5} /> CONFIDENCE LOG</h3>
-          <p style={S.label}>Wingman learns from how you felt</p>
+          <p style={S.label}>Wingman learns from how you felt after each session</p>
         </div>
         <div style={S.card}>
           {confidenceBookings.length === 0 ? (
             <p style={{ fontFamily: 'Inter', fontSize: '12px', color: '#6B6B6B', textAlign: 'center', padding: '20px 0', fontWeight: 600 }}>Complete a booking and rate how you felt. Wingman learns from this.</p>
-          ) : confidenceBookings.map(b => (
-            <div key={b.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 0', borderBottom: '1.5px solid rgba(26,26,26,0.1)' }}>
-              <div>
-                <p style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '13px', color: '#1A1A1A', margin: '0 0 2px' }}>{(b.professionalName || b.professional_name || 'GROOMING EXPERT').toUpperCase()}</p>
-                <p style={{ fontFamily: 'Inter', fontSize: '11px', color: '#F03E7A', fontWeight: 700, margin: '0 0 2px', textTransform: 'uppercase' }}>{b.serviceName || b.service}</p>
-                <p style={{ fontFamily: 'Inter', fontSize: '11px', color: '#6B6B6B', margin: 0, fontWeight: 600 }}>{new Date(b.date || b.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+          ) : confidenceBookings.map(b => {
+            const score = b.confidence_score !== undefined ? b.confidence_score : b.confidenceScore;
+            const rated = score !== undefined && score !== null;
+            const pending = pendingRatings[b.id];
+            const loading = ratingLoading[b.id];
+            const insight = confidenceInsights[b.id];
+            return (
+              <div key={b.id} style={{ padding: '14px 0', borderBottom: '1.5px solid rgba(26,26,26,0.1)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '13px', color: '#1A1A1A', margin: '0 0 2px' }}>{(b.professionalName || b.professional_name || 'GROOMING EXPERT').toUpperCase()}</p>
+                    <p style={{ fontFamily: 'Inter', fontSize: '11px', color: '#F03E7A', fontWeight: 700, margin: '0 0 2px', textTransform: 'uppercase' }}>{b.serviceName || b.service}</p>
+                    <p style={{ fontFamily: 'Inter', fontSize: '11px', color: '#6B6B6B', margin: 0, fontWeight: 600 }}>{new Date(b.date || b.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                  </div>
+                  <div style={{ flexShrink: 0 }}>
+                    {rated ? (
+                      renderStars(score)
+                    ) : (
+                      <div>
+                        <p style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: '10px', color: '#6B6B6B', textTransform: 'uppercase', letterSpacing: '0.06em', margin: '0 0 4px' }}>Rate it</p>
+                        <div style={{ display: 'flex', gap: '2px' }}>
+                          {[1,2,3,4,5].map(i => (
+                            <button
+                              key={i}
+                              disabled={loading}
+                              onClick={() => { setPendingRatings(p => ({ ...p, [b.id]: i })); rateBooking(b, i); }}
+                              style={{ background: 'none', border: 'none', cursor: loading ? 'wait' : 'pointer', padding: '1px', opacity: loading ? 0.5 : 1 }}
+                            >
+                              <svg width="18" height="18" viewBox="0 0 24 24"
+                                fill={(pending !== undefined ? i <= pending : false) ? '#F5C842' : 'none'}
+                                stroke="#1A1A1A" strokeWidth="2.5">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                              </svg>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                {/* AI insight shown after rating */}
+                {insight && (
+                  <div style={{ marginTop: '10px', background: '#FFF8F0', border: '1.5px solid #1A1A1A', padding: '10px 14px', boxShadow: '2px 2px 0 #1A1A1A', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                    <span style={{ fontSize: '14px', flexShrink: 0, marginTop: '1px' }}>✦</span>
+                    <p style={{ fontFamily: 'Inter', fontSize: '12px', color: '#1A1A1A', margin: 0, fontWeight: 600, lineHeight: 1.5 }}>{insight}</p>
+                  </div>
+                )}
               </div>
-              {renderStars(b.confidence_score !== undefined ? b.confidence_score : b.confidenceScore)}
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 

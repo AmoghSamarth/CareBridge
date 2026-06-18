@@ -108,6 +108,16 @@ export const WingmanProvider = ({ children }) => {
       }
     ]);
 
+    // Build full user profile to send to the server
+    const userProfile = {
+      name: user?.displayName?.split(' ')[0] || 'User',
+      hairType: onboardingData.hairType,
+      groomFrequency: onboardingData.groomFrequency,
+      budgetRange: onboardingData.budgetRange,
+      priority: onboardingData.priority,
+      upcomingEvent: onboardingData.upcomingEvent,
+    };
+
     try {
       // Connect to the SSE endpoint
       const response = await fetch('/api/wingman/message', {
@@ -115,7 +125,7 @@ export const WingmanProvider = ({ children }) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userId, triggerType })
+        body: JSON.stringify({ userId, triggerType, userProfile })
       });
 
       if (!response.body) {

@@ -164,4 +164,83 @@ Provide a single-sentence or max 2-sentences summary focusing on their strengths
   }
 });
 
+// POST /api/professionals
+// Create or update a professional profile
+router.post('/', async (req, res, next) => {
+  try {
+    const {
+      id,
+      name,
+      area,
+      services,
+      price_range,
+      experience_years,
+      bio,
+      image_url,
+      created_by,
+    } = req.body;
+
+    if (!id || !name || !area || !services || !price_range) {
+      return res.status(400).json({
+        success: false,
+        error: { message: 'Missing required fields: id, name, area, services, price_range.' }
+      });
+    }
+
+    const payload = {
+      id,
+      name,
+      area,
+      services: Array.isArray(services) ? services : [services],
+      price_range,
+      experience_years: parseInt(experience_years, 10) || 1,
+      bio: bio || '',
+      image_url: image_url || '',
+      rating: 4.5,
+      review_count: 0,
+      is_available: true,
+      is_featured: false,
+      created_by: created_by || 'demo',
+      created_at: new Date().toISOString(),
+    };
+
+    if (db) {
+      try {
+        await db.collection('professionals').doc(id).set(payload, { merge: true });
+      } catch (dbErr) {
+        console.warn('⚠️ Firestore professional write failed:', dbErr.message);
+      }
+    }
+
+    res.status(201).json({ success: true, data: payload });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// PATCH /api/professionals/:id
+// Update professional availability or profile fields
+router.patch('/:id', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+
+    if (db) {
+      try {
+        await db.collection('professionals').doc(id).update({
+          ...updates,
+          updated_at: new Date().toISOString()
+        });
+      } catch (dbErr) {
+        console.warn('⚠️ Firestore professional update failed:', dbErr.message);
+      }
+    }
+
+    res.json({ success: true, message: 'Professional updated.', id });
+  } catch (error) {
+    next(error);
+  }
+});
+
 export default router;
+

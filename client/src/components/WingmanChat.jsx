@@ -277,22 +277,22 @@ export default function WingmanChat({ onCollapse }) {
   // ── Chat view (post-onboarding) ──
   return (
     <div style={{
-      width: '100%', maxWidth: '680px', margin: '0 auto',
+      width: '100%', maxWidth: compact ? '100%' : '680px', margin: '0 auto',
       display: 'flex', flexDirection: 'column',
-      height: 'calc(100vh - 200px)', minHeight: '480px',
-      background: 'var(--bg-card)', border: '3px solid #1A1A1A',
-      boxShadow: '8px 8px 0 #1A1A1A', overflow: 'hidden',
+      height: compact ? '100%' : 'calc(100vh - 200px)', minHeight: compact ? 'auto' : '480px',
+      background: 'var(--bg-card)', border: compact ? 'none' : '3px solid #1A1A1A',
+      boxShadow: compact ? 'none' : '8px 8px 0 #1A1A1A', overflow: 'hidden',
     }}>
       {/* Header */}
-      <div style={{ background: '#1A1A1A', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: '12px', flexShrink: 0 }}>
-        <div style={{ width: '40px', height: '40px', background: '#F5C842', border: '2px solid #F5C842', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '10px' }}>
-          <Sparkles size={20} strokeWidth={2.5} color="#1A1A1A" />
+      <div style={{ background: '#1A1A1A', padding: compact ? '10px 14px' : '16px 20px', display: 'flex', alignItems: 'center', gap: compact ? '8px' : '12px', flexShrink: 0 }}>
+        <div style={{ width: compact ? '32px' : '40px', height: compact ? '32px' : '40px', background: '#F5C842', border: '2px solid #F5C842', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: compact ? '6px' : '10px' }}>
+          <Sparkles size={compact ? 16 : 20} strokeWidth={2.5} color="#1A1A1A" />
         </div>
         <div>
-          <p style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '14px', color: '#F5C842', margin: 0, letterSpacing: '0.08em' }}>WINGMAN</p>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <div style={{ width: '6px', height: '6px', background: '#2EC4B6', borderRadius: '50%' }} />
-            <p style={{ fontFamily: 'Inter', fontSize: '10px', color: '#aaa', margin: 0, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Active · AI Companion</p>
+          <p style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: compact ? '12px' : '14px', color: '#F5C842', margin: 0, letterSpacing: '0.08em' }}>WINGMAN</p>
+          <div style={{ display: 'flex', alignItems: 'center', gap: compact ? '4px' : '6px' }}>
+            <div style={{ width: compact ? '4px' : '6px', height: compact ? '4px' : '6px', background: '#2EC4B6', borderRadius: '50%' }} />
+            <p style={{ fontFamily: 'Inter', fontSize: compact ? '9px' : '10px', color: '#aaa', margin: 0, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Active · AI Companion</p>
           </div>
         </div>
         {onCollapse && (
@@ -303,23 +303,23 @@ export default function WingmanChat({ onCollapse }) {
               background: '#F5C842',
               border: '2px solid #1A1A1A',
               color: '#1A1A1A',
-              padding: '6px 12px',
+              padding: compact ? '4px 8px' : '6px 12px',
               fontFamily: 'Plus Jakarta Sans',
               fontWeight: 800,
-              fontSize: '11px',
+              fontSize: compact ? '9px' : '11px',
               textTransform: 'uppercase',
               letterSpacing: '0.06em',
               cursor: 'pointer',
-              boxShadow: '2.5px 2.5px 0 #000',
+              boxShadow: compact ? '1.5px 1.5px 0 #000' : '2.5px 2.5px 0 #000',
               transition: 'transform 0.1s, box-shadow 0.1s'
             }}
             onMouseEnter={e => {
-              e.currentTarget.style.transform = 'translate(-1.5px, -1.5px)';
-              e.currentTarget.style.boxShadow = '4px 4px 0 #000';
+              e.currentTarget.style.transform = compact ? 'translate(-1px, -1px)' : 'translate(-1.5px, -1.5px)';
+              e.currentTarget.style.boxShadow = compact ? '2.5px 2.5px 0 #000' : '4px 4px 0 #000';
             }}
             onMouseLeave={e => {
               e.currentTarget.style.transform = '';
-              e.currentTarget.style.boxShadow = '2.5px 2.5px 0 #000';
+              e.currentTarget.style.boxShadow = compact ? '1.5px 1.5px 0 #000' : '2.5px 2.5px 0 #000';
             }}
           >
             ▲ Collapse
@@ -328,11 +328,20 @@ export default function WingmanChat({ onCollapse }) {
       </div>
 
       {/* Messages */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '20px', background: '#FFF8F0', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+      <div style={{
+        flex: 1,
+        overflowY: 'auto',
+        maxHeight: compact ? '320px' : 'none',
+        padding: compact ? '12px 14px' : '20px',
+        background: '#FFF8F0',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: compact ? '8px' : '12px'
+      }}>
         {messages.length === 0 && !isTyping && (
-          <div style={{ textAlign: 'center', padding: '32px 16px' }}>
-            <div style={{ fontSize: '32px', marginBottom: '12px' }}>✦</div>
-            <p style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: '13px', color: '#6B6B6B' }}>Wingman is ready. Ask me anything!</p>
+          <div style={{ textAlign: 'center', padding: compact ? '20px 10px' : '32px 16px' }}>
+            <div style={{ fontSize: compact ? '24px' : '32px', marginBottom: '10px' }}>✦</div>
+            <p style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: compact ? '12px' : '13px', color: '#6B6B6B' }}>Wingman is ready. Ask me anything!</p>
           </div>
         )}
         {messages.map(msg => {
@@ -340,17 +349,17 @@ export default function WingmanChat({ onCollapse }) {
           return (
             <div key={msg.id} style={{ display: 'flex', justifyContent: isUser ? 'flex-end' : 'flex-start' }}>
               {!isUser && (
-                <div style={{ width: '28px', height: '28px', background: '#F5C842', border: '2px solid #1A1A1A', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '8px', flexShrink: 0, marginRight: '8px', marginTop: '4px' }}>
-                  <Sparkles size={13} strokeWidth={2.5} color="#1A1A1A" />
+                <div style={{ width: compact ? '24px' : '28px', height: compact ? '24px' : '28px', background: '#F5C842', border: '2px solid #1A1A1A', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: compact ? '6px' : '8px', flexShrink: 0, marginRight: compact ? '6px' : '8px', marginTop: '4px' }}>
+                  <Sparkles size={compact ? 11 : 13} strokeWidth={2.5} color="#1A1A1A" />
                 </div>
               )}
               <div style={{
-                maxWidth: '78%', padding: '12px 16px',
+                maxWidth: compact ? '85%' : '78%', padding: compact ? '8px 12px' : '12px 16px',
                 background: isUser ? '#1A1A1A' : '#F5C842',
                 border: '2px solid #1A1A1A',
-                boxShadow: '3px 3px 0 #1A1A1A',
-                fontFamily: 'Inter', fontSize: '14px', fontWeight: 500,
-                color: isUser ? '#FFF8F0' : '#1A1A1A', lineHeight: 1.6,
+                boxShadow: compact ? '2px 2px 0 #1A1A1A' : '3px 3px 0 #1A1A1A',
+                fontFamily: 'Inter', fontSize: compact ? '13px' : '14px', fontWeight: 500,
+                color: isUser ? '#FFF8F0' : '#1A1A1A', lineHeight: 1.5,
               }}>
                 {msg.text || (msg.isStreaming ? '' : '')}
                 {msg.isStreaming && (
@@ -361,14 +370,14 @@ export default function WingmanChat({ onCollapse }) {
           );
         })}
         {isTyping && !messages.some(m => m.isStreaming) && (
-          <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', gap: '8px' }}>
-            <div style={{ width: '28px', height: '28px', background: '#F5C842', border: '2px solid #1A1A1A', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '8px', flexShrink: 0 }}>
-              <Sparkles size={13} strokeWidth={2.5} color="#1A1A1A" />
+          <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', gap: compact ? '6px' : '8px' }}>
+            <div style={{ width: compact ? '24px' : '28px', height: compact ? '24px' : '28px', background: '#F5C842', border: '2px solid #1A1A1A', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: compact ? '6px' : '8px', flexShrink: 0 }}>
+              <Sparkles size={compact ? 11 : 13} strokeWidth={2.5} color="#1A1A1A" />
             </div>
-            <div style={{ background: '#F5C842', border: '2px solid #1A1A1A', boxShadow: '3px 3px 0 #1A1A1A', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: '11px', color: '#1A1A1A', letterSpacing: '0.06em' }}>THINKING</span>
+            <div style={{ background: '#F5C842', border: '2px solid #1A1A1A', boxShadow: compact ? '2px 2px 0 #1A1A1A' : '3px 3px 0 #1A1A1A', padding: compact ? '8px 12px' : '12px 16px', display: 'flex', alignItems: 'center', gap: compact ? '6px' : '8px' }}>
+              <span style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: compact ? '10px' : '11px', color: '#1A1A1A', letterSpacing: '0.06em' }}>THINKING</span>
               {[0, 150, 300].map((d, i) => (
-                <span key={i} style={{ width: '6px', height: '6px', background: '#1A1A1A', borderRadius: '50%', animation: 'bounce 0.6s infinite', animationDelay: `${d}ms` }} />
+                <span key={i} style={{ width: compact ? '4px' : '6px', height: compact ? '4px' : '6px', background: '#1A1A1A', borderRadius: '50%', animation: 'bounce 0.6s infinite', animationDelay: `${d}ms` }} />
               ))}
             </div>
           </div>
@@ -377,7 +386,7 @@ export default function WingmanChat({ onCollapse }) {
       </div>
 
       {/* Quick reply chips */}
-      <div style={{ padding: '10px 16px 4px', background: 'var(--bg-card)', borderTop: '1.5px solid rgba(26,26,26,0.1)', display: 'flex', gap: '6px', flexWrap: 'wrap', flexShrink: 0 }}>
+      <div style={{ padding: compact ? '6px 12px 2px' : '10px 16px 4px', background: 'var(--bg-card)', borderTop: '1.5px solid rgba(26,26,26,0.1)', display: 'flex', gap: compact ? '4px' : '6px', flexWrap: 'wrap', flexShrink: 0 }}>
         {QUICK_REPLIES.map(qr => (
           <button
             key={qr}
@@ -385,37 +394,38 @@ export default function WingmanChat({ onCollapse }) {
             disabled={isTyping}
             style={{
               background: 'var(--bg-card)', border: '1.5px solid #1A1A1A', color: 'var(--text-primary)',
-              padding: '5px 12px', fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: '10px',
+              padding: compact ? '4px 10px' : '5px 12px', fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: compact ? '9px' : '10px',
               letterSpacing: '0.04em', cursor: isTyping ? 'not-allowed' : 'pointer',
-              boxShadow: '2px 2px 0 #1A1A1A', transition: 'all 0.1s',
+              boxShadow: compact ? '1.5px 1.5px 0 #1A1A1A' : '2.5px 2.5px 0 #1A1A1A', transition: 'all 0.1s',
               opacity: isTyping ? 0.4 : 1,
             }}
-            onMouseEnter={e => { if (!isTyping) { e.currentTarget.style.transform = 'translate(-1px,-1px)'; e.currentTarget.style.background = '#F5C842'; e.currentTarget.style.boxShadow = '3px 3px 0 #1A1A1A'; }}}
-            onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.background = 'var(--bg-card)'; e.currentTarget.style.boxShadow = '2px 2px 0 #1A1A1A'; }}
+            onMouseEnter={e => { if (!isTyping) { e.currentTarget.style.transform = 'translate(-1px,-1px)'; e.currentTarget.style.background = '#F5C842'; e.currentTarget.style.boxShadow = compact ? '2.5px 2.5px 0 #1A1A1A' : '3.5px 3.5px 0 #1A1A1A'; }}}
+            onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.background = 'var(--bg-card)'; e.currentTarget.style.boxShadow = compact ? '1.5px 1.5px 0 #1A1A1A' : '2.5px 2.5px 0 #1A1A1A'; }}
           >
-            <Zap size={10} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle' }} />
+            <Zap size={compact ? 8 : 10} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle' }} />
             {qr}
           </button>
         ))}
       </div>
 
       {/* Input */}
-      <div style={{ padding: '12px 16px 16px', borderTop: '2.5px solid #1A1A1A', background: 'var(--bg-card)', display: 'flex', gap: '10px', flexShrink: 0 }}>
+      <div style={{ padding: compact ? '8px 12px 12px' : '12px 16px 16px', borderTop: '2.5px solid #1A1A1A', background: 'var(--bg-card)', display: 'flex', gap: compact ? '8px' : '10px', flexShrink: 0 }}>
         <input
           type="text" value={inputVal}
           onChange={e => setInputVal(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && handleSend()}
           placeholder="Ask Wingman anything..."
-          style={{ flex: 1, background: 'var(--bg-card)', border: '2.5px solid #1A1A1A', color: 'var(--text-primary)', padding: '12px 16px', fontFamily: 'Inter', fontSize: '14px', outline: 'none', boxShadow: '3px 3px 0 #1A1A1A' }}
+          style={{ flex: 1, background: 'var(--bg-card)', border: '2.5px solid #1A1A1A', color: 'var(--text-primary)', padding: compact ? '10px 12px' : '12px 16px', fontFamily: 'Inter', fontSize: compact ? '13px' : '14px', outline: 'none', boxShadow: compact ? '2px 2px 0 #1A1A1A' : '3px 3px 0 #1A1A1A' }}
         />
         <button onClick={handleSend} disabled={!inputVal.trim() || isTyping}
-          style={{ background: '#F5C842', border: '2.5px solid #1A1A1A', color: '#1A1A1A', padding: '12px 16px', cursor: 'pointer', boxShadow: '3px 3px 0 #1A1A1A', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: (!inputVal.trim() || isTyping) ? 0.4 : 1, transition: 'all 0.12s' }}
-          onMouseEnter={e => { if (inputVal.trim() && !isTyping) { e.currentTarget.style.transform = 'translate(-2px,-2px)'; e.currentTarget.style.boxShadow = '5px 5px 0 #1A1A1A'; }}}
-          onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '3px 3px 0 #1A1A1A'; }}
+          style={{ background: '#F5C842', border: '2.5px solid #1A1A1A', color: '#1A1A1A', padding: compact ? '10px 12px' : '12px 16px', cursor: 'pointer', boxShadow: compact ? '2px 2px 0 #1A1A1A' : '3px 3px 0 #1A1A1A', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: (!inputVal.trim() || isTyping) ? 0.4 : 1, transition: 'all 0.12s' }}
+          onMouseEnter={e => { if (inputVal.trim() && !isTyping) { e.currentTarget.style.transform = 'translate(-2px,-2px)'; e.currentTarget.style.boxShadow = compact ? '4px 4px 0 #1A1A1A' : '5px 5px 0 #1A1A1A'; }}}
+          onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = compact ? '2px 2px 0 #1A1A1A' : '3px 3px 0 #1A1A1A'; }}
         >
-          <Send size={16} strokeWidth={2.5} />
+          <Send size={compact ? 14 : 16} strokeWidth={2.5} />
         </button>
       </div>
     </div>
   );
+
 }

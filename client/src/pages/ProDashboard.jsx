@@ -18,15 +18,6 @@ const ALL_SERVICES = [
   'eyebrow shaping', 'cleanup', 'bleach', 'detan', 'full body wax'
 ];
 
-const DEMO_PROFILE = {
-  name: 'Vikram Demo',
-  area: 'Civil Lines',
-  services: ['haircut', 'beard', 'hair color'],
-  priceRange: '200-400',
-  experienceYears: '5',
-  bio: 'Award-winning stylist with 5 years experience in modern cuts and beard grooming. Certified in advanced coloring techniques.',
-  photoUrl: 'https://images.unsplash.com/photo-1622286346003-c5c7e63b1b87?auto=format&fit=crop&q=80&w=400',
-};
 
 const S = {
   page: { minHeight: '100vh', background: '#FAE8D8', fontFamily: 'Inter', color: '#1A1A1A' },
@@ -131,7 +122,6 @@ export default function ProDashboard() {
   const [boostLoading, setBoostLoading] = useState(false);
   const [boostBio, setBoostBio] = useState('');
   const [copied, setCopied] = useState(false);
-  const [demoLoading, setDemoLoading] = useState(false);
   const [editForm, setEditForm] = useState(null);
   const [editSaving, setEditSaving] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -213,15 +203,6 @@ export default function ProDashboard() {
     const payload = buildPayload(form);
     await saveProfile(payload);
     setSubmitting(false);
-    setView('success');
-  };
-
-  const loadDemoProfile = async () => {
-    setDemoLoading(true);
-    const f = { ...DEMO_PROFILE };
-    const payload = buildPayload({ ...f, priceRange: f.priceRange, priceMin: '', priceMax: '' });
-    await saveProfile(payload);
-    setDemoLoading(false);
     setView('success');
   };
 
@@ -647,20 +628,6 @@ export default function ProDashboard() {
           <button onClick={() => { window.location.href = getLandingUrl(); }} style={{ ...S.btn('#fff'), padding: '8px 16px', fontSize: '12px' }} onMouseEnter={e => hoverBtn(e, true)} onMouseLeave={e => hoverBtn(e, false)}>← Back</button>
         </div>
 
-        {/* 🎯 JUDGE DEMO BANNER */}
-        <div style={{ background: '#F5C842', border: '3px solid #1A1A1A', boxShadow: '6px 6px 0 #1A1A1A', padding: '20px 24px', marginBottom: '32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
-          <div>
-            <p style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '16px', color: '#1A1A1A', margin: '0 0 4px' }}>🎯 HACKATHON JUDGE?</p>
-            <p style={{ fontFamily: 'Inter', fontSize: '13px', color: '#1A1A1A', fontWeight: 600, margin: 0 }}>Click to instantly load a demo professional profile — no form filling needed.</p>
-          </div>
-          <button onClick={loadDemoProfile} disabled={demoLoading}
-            style={{ ...S.btn('#1A1A1A'), color: '#F5C842', fontSize: '13px', opacity: demoLoading ? 0.6 : 1 }}
-            onMouseEnter={e => { if (!demoLoading) { e.currentTarget.style.transform = 'translate(-2px,-2px)'; e.currentTarget.style.boxShadow = '5px 5px 0 #F5C842'; } }}
-            onMouseLeave={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '3px 3px 0 #1A1A1A'; }}
-          >
-            {demoLoading ? '⚡ Loading…' : '⚡ LOAD DEMO PROFILE'}
-          </button>
-        </div>
 
         <div style={{ maxWidth: '640px', margin: '0 auto' }}>
           <h1 style={{ ...S.h1, marginBottom: '6px' }}>Create Your Pro Profile</h1>

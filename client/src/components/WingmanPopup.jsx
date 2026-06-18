@@ -1,30 +1,67 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import Logo from './Logo';
+import WingmanChat from './WingmanChat';
 
-export default function WingmanPopup({ onAskWingman }) {
+export default function WingmanPopup() {
   const [open, setOpen] = useState(false);
+  const [hasNotification, setHasNotification] = useState(false);
+
+  useEffect(() => {
+    const seen = localStorage.getItem('carebridge_wingman_popup_seen');
+    if (!seen) setHasNotification(true);
+  }, []);
+
+  const handleToggle = () => {
+    setOpen(o => {
+      const next = !o;
+      if (next) {
+        setHasNotification(false);
+        localStorage.setItem('carebridge_wingman_popup_seen', 'true');
+      }
+      return next;
+    });
+  };
 
   return (
     <>
-      {/* Floating button */}
-      <motion.button
-        onClick={() => setOpen(o => !o)}
-        whileTap={{ scale: 0.92 }}
-        style={{
-          position: 'fixed', bottom: '84px', right: '20px', zIndex: 60,
-          width: '56px', height: '56px', borderRadius: '50%',
-          background: '#F5C842', border: '2.5px solid var(--border)',
-          boxShadow: '4px 4px 0 var(--shadow)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          cursor: 'pointer',
-        }}
-      >
-        {open ? <X size={22} color="#1A1A1A" strokeWidth={2.5} /> : <Logo size={28} />}
-      </motion.button>
+      {/* Floating button wrapped in container */}
+      <div style={{ position: 'fixed', bottom: '84px', right: '20px', zIndex: 60 }}>
+        {!open && (
+          <div style={{
+            position: 'absolute', inset: 0,
+            borderRadius: '50%',
+            animation: 'wingman-pulse 2.2s infinite',
+            pointerEvents: 'none',
+          }} />
+        )}
+        <motion.button
+          onClick={handleToggle}
+          whileTap={{ scale: 0.92 }}
+          animate={!open ? { y: [0, -4, 0] } : { y: 0 }}
+          transition={!open ? { duration: 1.6, repeat: Infinity, ease: 'easeInOut' } : { duration: 0.2 }}
+          style={{
+            position: 'relative',
+            width: '56px', height: '56px', borderRadius: '50%',
+            background: '#F5C842', border: '2.5px solid var(--border)',
+            boxShadow: '4px 4px 0 var(--shadow)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: 'pointer',
+          }}
+        >
+          {open ? <X size={22} color="#1A1A1A" strokeWidth={2.5} /> : <Logo size={28} />}
+          {hasNotification && (
+            <div style={{
+              position: 'absolute', top: '-4px', right: '-4px',
+              width: '14px', height: '14px', borderRadius: '50%',
+              background: '#FF6B35', border: '2px solid var(--bg-page)',
+            }} />
+          )}
+        </motion.button>
+      </div>
 
-      {/* Popup card */}
+      {/* Popup card showing real compact chat */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -34,52 +71,15 @@ export default function WingmanPopup({ onAskWingman }) {
             transition={{ duration: 0.18 }}
             style={{
               position: 'fixed', bottom: '150px', right: '20px', zIndex: 60,
-              width: 'min(320px, calc(100vw - 40px))',
+              width: 'min(360px, calc(100vw - 32px))',
+              maxHeight: '70vh',
               background: 'var(--bg-card)', border: '2.5px solid var(--border)',
               boxShadow: '6px 6px 0 var(--shadow)',
+              display: 'flex', flexDirection: 'column',
+              overflow: 'hidden',
             }}
           >
-            {/* Header */}
-            <div style={{
-              background: '#1A1A1A', padding: '12px 16px',
-              display: 'flex', alignItems: 'center', gap: '10px',
-            }}>
-              <Logo size={28} />
-              <div>
-                <p style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '12px', color: '#F5C842', letterSpacing: '0.06em', margin: 0 }}>
-                  WINGMAN
-                </p>
-                <p style={{ fontFamily: 'Inter', fontSize: '10px', color: '#888', margin: 0 }}>
-                  AI grooming companion
-                </p>
-              </div>
-            </div>
-
-            {/* Greeting bubble */}
-            <div style={{ padding: '16px' }}>
-              <div style={{
-                background: '#F5C842', border: '2px solid var(--border)',
-                boxShadow: '3px 3px 0 var(--shadow)', padding: '12px 14px',
-                fontFamily: 'Inter', fontWeight: 500, fontSize: '13px',
-                color: '#1A1A1A', lineHeight: 1.5,
-              }}>
-                Hello! 👋 I'm Wingman — your AI grooming companion. Want me to suggest a stylist or check your upcoming events?
-              </div>
-
-              <button
-                onClick={() => { setOpen(false); onAskWingman && onAskWingman(); }}
-                style={{
-                  marginTop: '12px', width: '100%', padding: '12px',
-                  background: '#2EC4B6', border: '2.5px solid var(--border)',
-                  boxShadow: '3px 3px 0 var(--shadow)',
-                  fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '11px',
-                  color: '#1A1A1A', textTransform: 'uppercase', letterSpacing: '0.06em',
-                  cursor: 'pointer',
-                }}
-              >
-                Open Wingman →
-              </button>
-            </div>
+            <WingmanChat onCollapse={() => setOpen(false)} compact />
           </motion.div>
         )}
       </AnimatePresence>

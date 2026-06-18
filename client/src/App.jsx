@@ -56,7 +56,7 @@ function AppContent() {
               </Suspense>
             </AnimatePresence>
           </main>
-          <WingmanPopup onAskWingman={() => setActiveTab('wingman')} />
+          <WingmanPopup />
         </div>
       </div>
     </WingmanProvider>

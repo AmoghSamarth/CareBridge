@@ -182,3 +182,9 @@ h1, h2, h3, h4, h5, h6 {
   .animate-float-rotate { animation: float-rotate 5s ease-in-out infinite; }
   .animate-blink        { animation: blink 1.2s step-end infinite; }
 }
+
+@keyframes wingman-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(245, 200, 66, 0.6); }
+  70% { box-shadow: 0 0 0 14px rgba(245, 200, 66, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(245, 200, 66, 0); }
+}

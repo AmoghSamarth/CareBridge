@@ -3,11 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useWingman } from '../context/WingmanContext';
 import { Sparkles, Zap, X, Clock } from 'lucide-react';
 
-const mockPro = {
-  id: 'ravi-sharma', name: 'Ravi Sharma', area: 'Dharampeth',
-  services: ['haircut', 'beard'], price_range: '150-300', rating: 4.9,
-  image_url: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&q=80&w=400',
-};
+import salonsData from '../data/salons.json';
 
 function getUpcomingBooking() {
   try {
@@ -28,6 +24,18 @@ function getUpcomingBooking() {
 
 export default function WingmanCard({ onBookNow, onOpenChat }) {
   const { onboardingData, messages } = useWingman();
+
+  const recommendedPro = (() => {
+    const budgetMax = parseInt((onboardingData?.budgetRange || '500').split('-')[1] || '500', 10);
+    const candidates = salonsData
+      .filter(p => p.is_available !== false)
+      .filter(p => {
+        const min = parseInt((p.price_range || '0').split('-')[0], 10) || 0;
+        return min <= budgetMax;
+      })
+      .sort((a, b) => (b.rating || 0) - (a.rating || 0));
+    return candidates[0] || salonsData[0];
+  })();
 
   const lastMsg = [...messages].reverse().find(m => m.sender === 'wingman');
   const fullText = lastMsg?.text || "Gearing up for your routine? Let me scan the top-rated professionals in Nagpur for you.";
@@ -166,7 +174,7 @@ export default function WingmanCard({ onBookNow, onOpenChat }) {
       {/* Recommendation card */}
       <div style={{ margin: '0 20px 20px', background: 'var(--bg-card)', border: '2.5px solid var(--border)', boxShadow: '4px 4px 0 var(--shadow)', padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-          <img src={mockPro.image_url} alt={mockPro.name}
+          <img src={recommendedPro.image_url} alt={recommendedPro.name}
             style={{ width: '52px', height: '52px', border: '2.5px solid var(--border)', objectFit: 'cover', flexShrink: 0, borderRadius: '12px', boxShadow: '3px 3px 0 var(--shadow)' }}
           />
           <div>
@@ -179,15 +187,15 @@ export default function WingmanCard({ onBookNow, onOpenChat }) {
               ✦ RECOMMENDED
             </span>
             <p style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '15px', color: 'var(--text-primary)', margin: 0 }}>
-              {mockPro.name}
+              {recommendedPro.name}
             </p>
             <p style={{ fontFamily: 'Inter', fontSize: '12px', color: 'var(--text-muted)', margin: '2px 0 0', fontWeight: 600 }}>
-              {mockPro.area} · ⭐ {mockPro.rating}
+              {recommendedPro.area} · ⭐ {recommendedPro.rating}
             </p>
           </div>
         </div>
 
-        <button onClick={() => onBookNow(mockPro)}
+        <button onClick={() => onBookNow(recommendedPro)}
           style={{
             fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '12px',
             color: '#fff', background: '#F03E7A',

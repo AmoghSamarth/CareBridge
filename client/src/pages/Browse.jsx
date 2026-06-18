@@ -49,8 +49,17 @@ const STATIC_PROFESSIONALS = [
   },
 ];
 
-const ALL_SERVICES = ['haircut', 'beard', 'facial', 'waxing', 'threading', 'bridal', 'makeup', 'hair color'];
-const ALL_AREAS = ['Dharampeth', 'Sitabuldi', 'Sadar', 'Ramdaspeth', 'Manish Nagar', 'Ambazari'];
+const ALL_SERVICES = ['haircut', 'beard', 'facial', 'waxing', 'threading', 'bridal', 'makeup', 'hair color', 'hair spa', 'mehendi'];
+const ALL_AREAS = ['Dharampeth', 'Sitabuldi', 'Sadar', 'Ramdaspeth', 'Manish Nagar', 'Ambazari', 'Civil Lines', 'Laxmi Nagar'];
+
+function getLocalPro() {
+  try {
+    const raw = localStorage.getItem('carebridge_pro_profile');
+    if (!raw) return null;
+    const p = JSON.parse(raw);
+    return { ...p, _isLocalPro: true };
+  } catch { return null; }
+}
 
 const pillStyle = (active) => ({
   fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: '11px',
@@ -101,6 +110,12 @@ export default function Browse() {
   const [aiSearching, setAiSearching] = useState(false);
   const [searchMode, setSearchMode] = useState('filter'); // 'filter' | 'ai'
 
+  // Inject localStorage pro profile at top
+  const localPro = getLocalPro();
+  const allProfessionals = localPro
+    ? [localPro, ...STATIC_PROFESSIONALS.filter(p => p.id !== localPro.id)]
+    : STATIC_PROFESSIONALS;
+
   const handleBookInitiate = (pro) => { setSelectedPro(pro); setIsBookingOpen(true); };
 
   // AI NLP search
@@ -149,11 +164,20 @@ export default function Browse() {
       const matchesService = serviceFilter === 'all' || p.services.includes(serviceFilter);
       const matchesArea = areaFilter === 'all' || p.area === areaFilter;
       return matchesService && matchesArea;
+    }).concat(localPro && serviceFilter === 'all' && areaFilter === 'all' ? [] : (localPro && serviceFilter !== 'all' && localPro.services?.includes(serviceFilter) ? [] : []));
+  }, [serviceFilter, areaFilter, localPro]);
+
+  // Build filtered list including local pro when applicable
+  const filteredWithLocal = useMemo(() => {
+    return allProfessionals.filter(p => {
+      const matchesService = serviceFilter === 'all' || p.services?.includes(serviceFilter);
+      const matchesArea = areaFilter === 'all' || p.area === areaFilter;
+      return matchesService && matchesArea;
     });
-  }, [serviceFilter, areaFilter]);
+  }, [serviceFilter, areaFilter, allProfessionals]);
 
   // Decide what to show
-  const displayPros = searchMode === 'ai' && aiResults !== null ? aiResults : filtered;
+  const displayPros = searchMode === 'ai' && aiResults !== null ? aiResults : filteredWithLocal;
   const isAiMode = searchMode === 'ai' && aiResults !== null;
 
   return (
@@ -244,9 +268,13 @@ export default function Browse() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '20px' }}>
           {displayPros.map(pro => (
             <div key={pro.id} style={{ position: 'relative' }}>
-              {isAiMode && (
-                <div style={{ position: 'absolute', top: '-8px', right: '-4px', zIndex: 10, background: '#F03E7A', border: '2px solid #1A1A1A', color: '#fff', padding: '2px 8px', fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.06em', boxShadow: '1px 1px 0 #1A1A1A' }}>
-                  ✦ AI MATCH
+              {(isAiMode || pro._isLocalPro) && (
+                <div style={{ position: 'absolute', top: '-8px', right: '-4px', zIndex: 10,
+                  background: pro._isLocalPro ? '#F03E7A' : '#F03E7A',
+                  border: '2px solid #1A1A1A', color: '#fff',
+                  padding: '2px 8px', fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '9px',
+                  textTransform: 'uppercase', letterSpacing: '0.06em', boxShadow: '1px 1px 0 #1A1A1A' }}>
+                  {pro._isLocalPro ? '✦ NEW' : '✦ AI MATCH'}
                 </div>
               )}
               <ProfessionalCard professional={pro} onBook={handleBookInitiate} onViewProfile={setPanelPro} />

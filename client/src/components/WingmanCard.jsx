@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useWingman } from '../context/WingmanContext';
-import { Sparkles, Zap } from 'lucide-react';
+import { Sparkles, Zap, X, Clock } from 'lucide-react';
 
 const mockPro = {
   id: 'ravi-sharma', name: 'Ravi Sharma', area: 'Dharampeth',
@@ -9,14 +9,37 @@ const mockPro = {
   image_url: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&q=80&w=400',
 };
 
-export default function WingmanCard({ onBookNow }) {
+function getUpcomingBooking() {
+  try {
+    const raw = localStorage.getItem('carebridge_bookings_demo-user-customer') || '[]';
+    const bookings = JSON.parse(raw);
+    const now = Date.now();
+    const sevenDays = 7 * 24 * 60 * 60 * 1000;
+    return bookings.find(b => {
+      if (b.status !== 'confirmed') return false;
+      const d = new Date(b.bookingDate || b.date);
+      const diff = d.getTime() - now;
+      return diff > 0 && diff <= sevenDays;
+    }) || null;
+  } catch {
+    return null;
+  }
+}
+
+export default function WingmanCard({ onBookNow, onOpenChat }) {
   const { onboardingData, messages } = useWingman();
 
   const lastMsg = [...messages].reverse().find(m => m.sender === 'wingman');
   const fullText = lastMsg?.text || "Gearing up for your routine? Let me scan the top-rated professionals in Nagpur for you.";
 
   const [displayedText, setDisplayedText] = useState('');
+  const [reminderDismissed, setReminderDismissed] = useState(false);
+  const [upcomingBooking, setUpcomingBooking] = useState(null);
   const prevRef = useRef('');
+
+  useEffect(() => {
+    setUpcomingBooking(getUpcomingBooking());
+  }, []);
 
   useEffect(() => {
     if (fullText === prevRef.current) return;
@@ -32,6 +55,7 @@ export default function WingmanCard({ onBookNow }) {
 
   const hasEvent = onboardingData?.upcomingEvent?.eventType;
   const eventDate = onboardingData?.upcomingEvent?.eventDate;
+  const showReminder = upcomingBooking && !reminderDismissed;
 
   return (
     <motion.div
@@ -59,7 +83,7 @@ export default function WingmanCard({ onBookNow }) {
             <p style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '11px', color: '#F5C842', margin: 0, letterSpacing: '0.1em' }}>WINGMAN ASSISTANT</p>
             <div style={{ display: 'flex', alignItems: 'center', gap: '5px', marginTop: '2px' }}>
               <div style={{ width: '5px', height: '5px', background: '#2EC4B6', borderRadius: '50%' }} />
-              <p style={{ fontFamily: 'Inter', fontSize: '9px', color: '#aaa', margin: 0, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>AI Companion Dashboard</p>
+              <p style={{ fontFamily: 'Inter', fontSize: '9px', color: '#aaa', margin: 0, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>AI Companion · Gemini Powered</p>
             </div>
           </div>
         </div>
@@ -78,8 +102,47 @@ export default function WingmanCard({ onBookNow }) {
         )}
       </div>
 
-      {/* Message */}
-      <div style={{ padding: '28px 24px 20px' }}>
+      {/* Booking Reminder Banner */}
+      <AnimatePresence>
+        {showReminder && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2 }}
+            style={{
+              background: '#F5C842', borderBottom: '2.5px solid #1A1A1A',
+              padding: '12px 20px',
+              display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '12px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+              <Clock size={18} strokeWidth={2.5} color="#1A1A1A" style={{ flexShrink: 0, marginTop: '1px' }} />
+              <div>
+                <p style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 800, fontSize: '12px', color: '#1A1A1A', margin: '0 0 2px', letterSpacing: '0.04em' }}>
+                  📅 REMINDER: Your {upcomingBooking.service} with {upcomingBooking.professional_name || upcomingBooking.professionalName || 'your groomer'}
+                </p>
+                <p style={{ fontFamily: 'Inter', fontSize: '11px', fontWeight: 600, color: '#1A1A1A', opacity: 0.8, margin: 0 }}>
+                  is on {new Date(upcomingBooking.bookingDate || upcomingBooking.date).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' })} at {upcomingBooking.slot}. Need anything before then?
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => setReminderDismissed(true)}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', flexShrink: 0 }}
+            >
+              <X size={16} strokeWidth={2.5} color="#1A1A1A" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Message — clickable to open full chat */}
+      <div
+        onClick={onOpenChat}
+        style={{ padding: '28px 24px 20px', cursor: onOpenChat ? 'pointer' : 'default' }}
+        title={onOpenChat ? 'Click to open Wingman chat' : ''}
+      >
         <p style={{
           fontFamily: 'Plus Jakarta Sans', fontWeight: 700,
           fontSize: 'clamp(15px, 2.2vw, 19px)', color: '#1A1A1A',
@@ -92,6 +155,12 @@ export default function WingmanCard({ onBookNow }) {
           )}
           "
         </p>
+        {onOpenChat && displayedText === fullText && (
+          <p style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: '10px', color: '#1A1A1A', opacity: 0.6, textTransform: 'uppercase', letterSpacing: '0.08em', margin: '8px 0 0', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <Sparkles size={10} />
+            CLICK TO CHAT WITH WINGMAN
+          </p>
+        )}
       </div>
 
       {/* Recommendation card */}

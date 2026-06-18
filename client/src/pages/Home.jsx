@@ -96,7 +96,7 @@ export default function Home({ setActiveTab }) {
             ✦ WINGMAN'S ADVICE
           </span>
         </div>
-        <WingmanCard onBookNow={handleBookInitiate} />
+        <WingmanCard onBookNow={handleBookInitiate} onOpenChat={() => { setActiveTab('wingman'); setTimeout(() => { document.getElementById('wingman-chat-anchor')?.scrollIntoView({ behavior: 'smooth' }); }, 100); }} />
       </div>
 
       {/* Professionals Section */}

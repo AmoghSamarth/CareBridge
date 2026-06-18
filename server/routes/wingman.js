@@ -29,7 +29,7 @@ router.post('/message', async (req, res, next) => {
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Connection', 'keep-alive');
 
-    // Defaults from fallback
+    // Defaults
     let name = 'Arjun';
     let hairType = 'Wavy';
     let budgetRange = '200-350';
@@ -41,9 +41,8 @@ router.post('/message', async (req, res, next) => {
     let lastService = 'Haircut & Beard Trim';
     let lastBookingDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
       .toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
-    let bestPro = salonsData[0];
 
-    // If userProfile is passed in from client, use it directly
+    // Use userProfile from client if provided
     if (userProfile) {
       name = userProfile.name || name;
       hairType = userProfile.hairType || hairType;
@@ -60,7 +59,7 @@ router.post('/message', async (req, res, next) => {
       }
     }
 
-    // Supplement with Firestore if available and userProfile not complete
+    // Supplement with Firestore
     if (db) {
       try {
         const userDoc = await db.collection('users').doc(userId).get();
@@ -89,30 +88,86 @@ router.post('/message', async (req, res, next) => {
           if (bData.bookingDate) lastBookingDate = new Date(bData.bookingDate)
             .toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
         }
-
-        const prosSnapshot = await db.collection('professionals').orderBy('rating', 'desc').limit(3).get();
-        if (!prosSnapshot.empty) bestPro = prosSnapshot.docs[0].data();
       } catch {}
     }
 
-    const prompt = `Generate a Wingman message for this user:
+    // Build salon context — filter by budget and sort by rating
+    const budgetMax = parseInt((budgetRange || '300').split('-')[1] || budgetRange, 10) || 500;
+    const relevantPros = salonsData
+      .filter(p => {
+        if (!p.price_range) return true;
+        const min = parseInt(p.price_range.split('-')[0], 10) || 0;
+        return min <= budgetMax;
+      })
+      .sort((a, b) => (b.rating || 0) - (a.rating || 0))
+      .slice(0, 4);
+
+    const availablePros = salonsData.filter(p => p.is_available !== false);
+
+    const salonContext = relevantPros.map(p =>
+      `• ${p.name} (${p.area}) — ${p.services?.join(', ') || 'grooming'} — ₹${p.price_range} — ${p.rating}★ — ${p.is_available !== false ? 'Available today' : 'Offline'}`
+    ).join('\n');
+
+    const availableContext = availablePros.map(p =>
+      `• ${p.name} (${p.area}) — ${p.services?.join(', ') || 'grooming'} — ₹${p.price_range}`
+    ).join('\n');
+
+    // Hairstyle suggestions by hair type + event
+    const hairstyleMap = {
+      'Straight': {
+        'Interview': ['sleek side part', 'clean executive cut', 'textured quiff'],
+        'Wedding': ['slicked back', 'classic side part', 'low fade with texture'],
+        'default': ['textured crop', 'sleek side sweep', 'clean undercut'],
+      },
+      'Wavy': {
+        'Interview': ['tamed waves with matte pomade', 'structured side part', 'defined crop'],
+        'Wedding': ['beachy waves with light hold', 'French crop', 'messy quiff'],
+        'default': ['natural waves enhanced', 'curtain hair', 'tousled crop'],
+      },
+      'Curly': {
+        'Interview': ['defined curls with light hold cream', 'tapered sides with curl top', 'neat afro'],
+        'Wedding': ['shaped afro', 'twist out', 'curl defined with shea'],
+        'default': ['wash and go curls', 'defined spiral', 'pineapple updo'],
+      },
+      'Coily': {
+        'Interview': ['groomed afro', 'coil defined', 'low fade with coils on top'],
+        'Wedding': ['crowned afro', 'shaped coils', 'TWA with edge-up'],
+        'default': ['moisturized coils', 'strand twist', 'puff'],
+      },
+    };
+    const hairstyles = (hairstyleMap[hairType] || hairstyleMap['Wavy']);
+    const suggestedStyles = hairstyles[eventType] || hairstyles['default'];
+
+    const prompt = `You are Wingman — CareBridge's AI grooming companion for Indian users in Tier-2 cities. Talk like a sharp, warm, direct friend. Always specific — reference name, event, budget, hair type. Never say "based on your profile" or "as your AI assistant". Keep every message under 4 sentences. End with one clear bookable action. Sound confident, warm, slightly informal.
+
+USER PROFILE:
 Name: ${name}
 Hair type: ${hairType}
 Budget: ₹${budgetRange}
 Groom frequency: ${groomFrequency}
 Priority: ${priority}
 Upcoming event: ${eventType} on ${eventDate}
-Last booking: ${lastService} on ${lastBookingDate}
-Best available professional: ${bestPro.name}, ${bestPro.services ? bestPro.services.join(', ') : 'grooming'}, ${bestPro.rating} stars, ${bestPro.area}
-Trigger: ${triggerType}
+Last service: ${lastService} on ${lastBookingDate}
 
-triggerType meanings:
-- onboarding_complete: welcome them warmly, acknowledge their event, give one specific recommendation
-- event_nudge: remind them their event is coming, urgently suggest booking
-- post_booking: congratulate, ask how it went
-- recommendation_request: suggest the best professional for their current need
-- check_in: casual check-in, ask if they need anything
-- chat: user sent a message, respond conversationally as Wingman`;
+TOP NAGPUR PROFESSIONALS WITHIN BUDGET:
+${salonContext}
+
+ALL PROFESSIONALS AVAILABLE TODAY:
+${availableContext}
+
+HAIRSTYLE SUGGESTIONS FOR ${hairType.toUpperCase()} HAIR + ${eventType.toUpperCase()}:
+${suggestedStyles.join(', ')}
+
+TRIGGER: ${triggerType}
+
+TRIGGER GUIDE:
+- onboarding_complete: Welcome them warmly, reference their ${eventType} in ${eventDate}, recommend 1 specific professional by name and area, ask to book
+- event_nudge: Their ${eventType} is coming up, create urgency, suggest a specific look (from hairstyles above), name 1 professional
+- post_booking: Congratulate on the booking, ask how it went, offer a quick tip for their hair type
+- recommendation_request: Pick the best 2 professionals from the list that match their budget, mention their services and rating, ask if they want to book either
+- check_in: Casual check-in about their grooming routine, reference when they last booked, suggest their next visit based on groom frequency
+- chat: User sent a message — respond conversationally as Wingman. If they ask about hairstyles, recommend from the list above. If they ask about availability or "who's available today", list professionals available. If they ask about salons/professionals, name specific pros from the salon context. Always end with a booking CTA.
+- reminder: Pre-appointment pep message — remind them what to prep before ${eventType}, suggest arriving fresh, wish them luck`;
 
     if (process.env.GOOGLE_API_KEY) {
       try {
@@ -123,11 +178,11 @@ triggerType meanings:
             res.write(`data: ${JSON.stringify({ text, chunk: text })}\n\n`);
           }
         }
-      } catch (geminiErr) {
-        await streamFallbackMock(res, name, eventType, bestPro, hairType);
+      } catch {
+        await streamFallbackMock(res, name, eventType, relevantPros[0] || salonsData[0], hairType);
       }
     } else {
-      await streamFallbackMock(res, name, eventType, bestPro, hairType);
+      await streamFallbackMock(res, name, eventType, relevantPros[0] || salonsData[0], hairType);
     }
 
     res.write('data: [DONE]\n\n');
@@ -150,7 +205,6 @@ router.post('/confidence-learn', async (req, res, next) => {
       });
     }
 
-    // Find professional name for better context
     let proName = professionalId || 'your groomer';
     let proArea = 'Nagpur';
 
@@ -170,7 +224,6 @@ router.post('/confidence-learn', async (req, res, next) => {
       if (localPro) { proName = localPro.name; proArea = localPro.area; }
     }
 
-    // Save confidence score to Firestore
     if (db) {
       try {
         const payload = {
@@ -184,8 +237,7 @@ router.post('/confidence-learn', async (req, res, next) => {
         };
         await db.collection('confidence_logs').add(payload);
 
-        // Also update the booking document if bookingId provided
-        if (bookingId && bookingId !== 'local') {
+        if (bookingId && !bookingId.startsWith('local')) {
           try {
             await db.collection('bookings').doc(bookingId).update({
               confidence_score: confidenceScore,
@@ -196,10 +248,9 @@ router.post('/confidence-learn', async (req, res, next) => {
       } catch {}
     }
 
-    // Generate insight with Gemini
     const stars = confidenceScore;
     const sentiment = stars >= 4 ? 'excellent' : stars >= 3 ? 'good' : 'average';
-    let insight = `Based on your ${stars}-star rating after your ${service || 'grooming'} session with ${proName}, I'll prioritise ${proArea} professionals for your next grooming reminder.`;
+    let insight = `Your ${stars}-star rating for ${proName} in ${proArea} tells me a lot — I'll prioritise similar pros for your next booking.`;
 
     if (process.env.GOOGLE_API_KEY) {
       try {
@@ -208,7 +259,7 @@ Professional: ${proName} (${proArea})
 Service: ${service || 'grooming session'}
 Star rating: ${stars}/5 (${sentiment} experience)
 
-Generate a short, warm 1-sentence Wingman insight about what this rating tells us and how it will improve their future recommendations. Be specific about the professional and service. Sound like a friend, not a bot. Never start with "Based on" or "I".`;
+Generate a short, warm 1-sentence Wingman insight about what this rating tells us and how it will improve their future recommendations. Be specific about the professional and service. Sound like a friend, not a bot. Never start with "Based on" or "I". Max 30 words.`;
 
         const response = await geminiModel.generateContent(prompt);
         const raw = response.response.text().trim();
@@ -224,12 +275,12 @@ Generate a short, warm 1-sentence Wingman insight about what this rating tells u
 
 // Helper for live mock text streaming
 async function streamFallbackMock(res, name, eventType, pro, hairType) {
-  const mockText = `Hey ${name}! Looking fresh is the goal, especially with your ${eventType} coming up. For your ${hairType} hair, I highly recommend ${pro.name} in ${pro.area} — clients love their attention to detail. Want me to check their slots for this week?`;
+  const mockText = `Hey ${name}! With your ${eventType} coming up, this is the perfect time to freshen up. For your ${hairType} hair, I'd recommend ${pro?.name || 'Ravi Sharma'} in ${pro?.area || 'Dharampeth'} — ${pro?.rating || 4.9}★ rated and within your budget. Want me to lock in a slot for you?`;
   const words = mockText.split(' ');
   for (const word of words) {
     const chunkVal = word + ' ';
     res.write(`data: ${JSON.stringify({ text: chunkVal, chunk: chunkVal })}\n\n`);
-    await new Promise(resolve => setTimeout(resolve, 60));
+    await new Promise(resolve => setTimeout(resolve, 55));
   }
 }
 

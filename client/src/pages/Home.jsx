@@ -58,6 +58,7 @@ export default function Home({ setActiveTab }) {
   const [panelPro, setPanelPro] = useState(null);
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [isEmergencyOpen, setIsEmergencyOpen] = useState(false);
+  const [chatExpanded, setChatExpanded] = useState(false);
 
   const handleBookInitiate = (pro) => { setSelectedPro(pro); setIsBookingOpen(true); };
 
@@ -96,7 +97,21 @@ export default function Home({ setActiveTab }) {
             ✦ WINGMAN'S ADVICE
           </span>
         </div>
-        <WingmanCard onBookNow={handleBookInitiate} onOpenChat={() => { setActiveTab('wingman'); setTimeout(() => { document.getElementById('wingman-chat-anchor')?.scrollIntoView({ behavior: 'smooth' }); }, 100); }} />
+        <WingmanCard 
+          onBookNow={handleBookInitiate} 
+          onOpenChat={() => {
+            setChatExpanded(true);
+            setTimeout(() => {
+              document.getElementById('wingman-chat-anchor')
+                ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 50);
+          }} 
+        />
+        {chatExpanded && (
+          <div id="wingman-chat-anchor" style={{ marginTop: '16px' }}>
+            <WingmanChat onCollapse={() => setChatExpanded(false)} />
+          </div>
+        )}
       </div>
 
       {/* Professionals Section */}

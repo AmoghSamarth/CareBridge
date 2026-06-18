@@ -6,6 +6,8 @@ import { getLandingUrl } from '../lib/urls';
 import { doc, getDoc, setDoc, deleteDoc, collection, getDocs, addDoc } from 'firebase/firestore';
 import { Settings, Calendar, Plus, Trash2, Sparkles, LogOut, RefreshCw, Trash } from 'lucide-react';
 
+const API_BASE = import.meta.env.VITE_API_URL || '';
+
 const S = {
   card: { background: '#fff', border: '2.5px solid #1A1A1A', boxShadow: '5px 5px 0 #1A1A1A', padding: '24px' },
   label: { fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: '10px', color: '#6B6B6B', textTransform: 'uppercase', letterSpacing: '0.08em' },
@@ -137,7 +139,7 @@ export default function Profile() {
 
     // Call confidence-learn API
     try {
-      const res = await fetch('/api/wingman/confidence-learn', {
+      const res = await fetch(`${API_BASE}/api/wingman/confidence-learn`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

@@ -4,6 +4,8 @@ import BookingModal from '../components/BookingModal';
 import ProfessionalPanel from '../components/ProfessionalPanel';
 import { Search } from 'lucide-react';
 
+const API_BASE = import.meta.env.VITE_API_URL || '';
+
 const STATIC_PROFESSIONALS = [
   {
     id: 'ravi-sharma', name: 'Ravi Sharma', area: 'Dharampeth',
@@ -127,7 +129,7 @@ export default function Browse() {
     setNlpQuery(q);
 
     try {
-      const res = await fetch('/api/search', {
+      const res = await fetch(`${API_BASE}/api/search`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query: q })

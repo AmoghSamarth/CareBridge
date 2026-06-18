@@ -5,6 +5,8 @@ import confetti from 'canvas-confetti';
 import { useAuth } from '../context/AuthContext';
 import fallbackProfessionals from '../data/salons.json';
 
+const API_BASE = import.meta.env.VITE_API_URL || '';
+
 export default function EmergencyModal({ isOpen, onClose, onBookingSuccess }) {
   const { user } = useAuth();
   const [step, setStep] = useState(1);
@@ -27,7 +29,7 @@ export default function EmergencyModal({ isOpen, onClose, onBookingSuccess }) {
   const findBestMatch = async () => {
     let list = fallbackProfessionals;
     try {
-      const res = await fetch('/api/professionals');
+      const res = await fetch(`${API_BASE}/api/professionals`);
       const data = await res.json();
       if (data.success && data.data) {
         list = data.data;
@@ -100,7 +102,7 @@ export default function EmergencyModal({ isOpen, onClose, onBookingSuccess }) {
     };
 
     try {
-      const res = await fetch('/api/bookings', {
+      const res = await fetch(`${API_BASE}/api/bookings`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

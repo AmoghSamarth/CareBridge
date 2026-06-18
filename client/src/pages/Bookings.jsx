@@ -5,6 +5,8 @@ import { Clock, MapPin, Sparkles, AlertCircle, ArrowRight } from 'lucide-react';
 import { db, isFirebaseInitialized } from '../lib/firebase';
 import { collection, query, where, onSnapshot, doc, updateDoc } from 'firebase/firestore';
 
+const API_BASE = import.meta.env.VITE_API_URL || '';
+
 const pill = (bg, text) => ({
   display: 'inline-block', background: bg, color: text,
   border: '1.5px solid #1A1A1A', padding: '2px 10px',
@@ -50,7 +52,7 @@ export default function Bookings({ setActiveTab }) {
     const updated = list.map(b => b.id === id ? { ...b, ...data } : b);
     localStorage.setItem(key, JSON.stringify(updated)); setBookings(updated);
     if (isFirebaseInitialized && db) { try { await updateDoc(doc(db, 'bookings', id), data); } catch {} }
-    try { await fetch(`/api/bookings/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); } catch {}
+    try { await fetch(`${API_BASE}/api/bookings/${id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); } catch {}
   };
 
   const upcoming = bookings.filter(b => b.status === 'confirmed' || b.status === 'pending');

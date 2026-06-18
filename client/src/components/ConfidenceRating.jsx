@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Sparkles, Star, ThumbsUp } from 'lucide-react';
 
+const API_BASE = import.meta.env.VITE_API_URL || '';
+
 export default function ConfidenceRating({ bookingId, proName, service, onRateSubmitted }) {
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
@@ -10,7 +12,7 @@ export default function ConfidenceRating({ bookingId, proName, service, onRateSu
     if (rating === 0) return;
     
     try {
-      await fetch(`/api/bookings/${bookingId}/confidence`, {
+      await fetch(`${API_BASE}/api/bookings/${bookingId}/confidence`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

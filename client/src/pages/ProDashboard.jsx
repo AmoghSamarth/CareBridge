@@ -2,7 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { getLandingUrl } from '../lib/urls';
 import { db, isFirebaseInitialized } from '../lib/firebase';
-import { doc, setDoc, getDoc, collection, query, where, onSnapshot } from 'firebase/firestore';
+import { doc, setDoc, getDoc, collection, query, where, onSnapshot, deleteDoc } from 'firebase/firestore';
+
+const API_BASE = import.meta.env.VITE_API_URL || '';
 
 const NAGPUR_AREAS = [
   'Dharampeth', 'Sitabuldi', 'Sadar', 'Ramdaspeth', 'Civil Lines',
@@ -132,6 +134,7 @@ export default function ProDashboard() {
   const [demoLoading, setDemoLoading] = useState(false);
   const [editForm, setEditForm] = useState(null);
   const [editSaving, setEditSaving] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const [form, setForm] = useState({
     name: '', area: 'Dharampeth', services: [], priceRange: '',
@@ -249,7 +252,7 @@ export default function ProDashboard() {
     setBoostLoading(true);
     setBoostBio('');
     try {
-      const res = await fetch('/api/wingman/message', {
+      const res = await fetch(`${API_BASE}/api/wingman/message`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -312,6 +315,19 @@ export default function ProDashboard() {
     setEditForm(null);
   };
 
+  const handleDeleteProfile = async () => {
+    if (proProfile?.id && isFirebaseInitialized && db) {
+      try {
+        await deleteDoc(doc(db, 'professionals', proProfile.id));
+      } catch (err) {
+        console.error('Error deleting professional profile:', err);
+      }
+    }
+    localStorage.removeItem('carebridge_pro_profile');
+    logout();
+    window.location.href = getLandingUrl();
+  };
+
   // ── LOADING ──
   if (view === 'loading') return (
     <div style={{ ...S.page, display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
@@ -371,7 +387,7 @@ export default function ProDashboard() {
                 style={{ ...S.btn(isAvailable ? '#2EC4B6' : '#eee') }}
                 onMouseEnter={e => hoverBtn(e, true)} onMouseLeave={e => hoverBtn(e, false)}
               >{isAvailable ? '🟢 AVAILABLE' : '🔴 OFFLINE'}</button>
-              <button onClick={() => { localStorage.removeItem('carebridge_pro_profile'); logout(); window.location.href = getLandingUrl(); }}
+              <button onClick={() => { logout(); window.location.href = getLandingUrl(); }}
                 style={{ ...S.btn('#fff') }}
                 onMouseEnter={e => hoverBtn(e, true)} onMouseLeave={e => hoverBtn(e, false)}
               >Sign Out</button>
@@ -550,6 +566,24 @@ export default function ProDashboard() {
                       style={{ ...S.btn(isAvailable ? '#2EC4B6' : '#eee') }}
                       onMouseEnter={e => hoverBtn(e, true)} onMouseLeave={e => hoverBtn(e, false)}
                     >{isAvailable ? '🟢 SET OFFLINE' : '🔴 GO ONLINE'}</button>
+                  </div>
+                  <div style={{ marginTop: '28px', paddingTop: '24px', borderTop: '2.5px dashed #1A1A1A' }}>
+                    {!confirmDelete ? (
+                      <button onClick={() => setConfirmDelete(true)}
+                        style={{ ...S.btn('#fff'), color: '#F03E7A' }}
+                        onMouseEnter={e => hoverBtn(e, true)} onMouseLeave={e => hoverBtn(e, false)}
+                      >🗑️ DELETE PROFESSIONAL PROFILE</button>
+                    ) : (
+                      <div style={{ background: '#F03E7A', border: '2.5px solid #1A1A1A', padding: '20px', color: '#fff', boxShadow: '4px 4px 0 #1A1A1A' }}>
+                        <p style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: '13px', color: '#fff', marginBottom: '16px' }}>
+                          This will delete your professional profile from CareBridge completely. Are you sure?
+                        </p>
+                        <div style={{ display: 'flex', gap: '12px' }}>
+                          <button onClick={() => setConfirmDelete(false)} style={{ background: '#fff', border: '2px solid #1A1A1A', color: '#1A1A1A', padding: '8px 20px', fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: '12px', cursor: 'pointer', boxShadow: '2px 2px 0 #1A1A1A' }}>CANCEL</button>
+                          <button onClick={handleDeleteProfile} style={{ background: '#1A1A1A', border: '2px solid #fff', color: '#fff', padding: '8px 20px', fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: '12px', cursor: 'pointer', boxShadow: '2px 2px 0 #fff' }}>CONFIRM DELETE</button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </>
               ) : (

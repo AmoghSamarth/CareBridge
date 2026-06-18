@@ -47,7 +47,7 @@ const QUICK_REPLIES = [
   "What's trending in Nagpur",
 ];
 
-export default function WingmanChat() {
+export default function WingmanChat({ onCollapse }) {
   const { user } = useAuth();
   const {
     onboardingComplete, onboardingStep, onboardingData, messages, isTyping,
@@ -295,6 +295,36 @@ export default function WingmanChat() {
             <p style={{ fontFamily: 'Inter', fontSize: '10px', color: '#aaa', margin: 0, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Active · AI Companion</p>
           </div>
         </div>
+        {onCollapse && (
+          <button 
+            onClick={onCollapse} 
+            style={{
+              marginLeft: 'auto',
+              background: '#F5C842',
+              border: '2px solid #1A1A1A',
+              color: '#1A1A1A',
+              padding: '6px 12px',
+              fontFamily: 'Plus Jakarta Sans',
+              fontWeight: 800,
+              fontSize: '11px',
+              textTransform: 'uppercase',
+              letterSpacing: '0.06em',
+              cursor: 'pointer',
+              boxShadow: '2.5px 2.5px 0 #000',
+              transition: 'transform 0.1s, box-shadow 0.1s'
+            }}
+            onMouseEnter={e => {
+              e.currentTarget.style.transform = 'translate(-1.5px, -1.5px)';
+              e.currentTarget.style.boxShadow = '4px 4px 0 #000';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.transform = '';
+              e.currentTarget.style.boxShadow = '2.5px 2.5px 0 #000';
+            }}
+          >
+            ▲ Collapse
+          </button>
+        )}
       </div>
 
       {/* Messages */}

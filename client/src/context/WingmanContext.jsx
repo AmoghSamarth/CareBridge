@@ -4,6 +4,7 @@ import { db, isFirebaseInitialized } from '../lib/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 
 const WingmanContext = createContext();
+const API_BASE = import.meta.env.VITE_API_URL || '';
 
 export const useWingman = () => useContext(WingmanContext);
 
@@ -120,7 +121,7 @@ export const WingmanProvider = ({ children }) => {
 
     try {
       // Connect to the SSE endpoint
-      const response = await fetch('/api/wingman/message', {
+      const response = await fetch(`${API_BASE}/api/wingman/message`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

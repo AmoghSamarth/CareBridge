@@ -6,6 +6,8 @@ import { useAuth } from '../context/AuthContext';
 import { db, isFirebaseInitialized } from '../lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
+const API_BASE = import.meta.env.VITE_API_URL || '';
+
 export default function BookingModal({ professional, isOpen, onClose, onBookingSuccess }) {
   const { user } = useAuth();
   const [step, setStep] = useState(1);
@@ -135,7 +137,7 @@ export default function BookingModal({ professional, isOpen, onClose, onBookingS
       }
 
       // Offline API hit
-      const res = await fetch('/api/bookings', {
+      const res = await fetch(`${API_BASE}/api/bookings`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

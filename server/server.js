@@ -13,6 +13,10 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
+app.get('/', (req, res) => {
+  res.json({ message: 'CareBridge API is live 🚀', version: '1.0.0' });
+});
+
 // Basic Health Check Route
 app.get('/api/health', (req, res) => {
   res.json({

@@ -178,10 +178,11 @@ TRIGGER GUIDE:
             res.write(`data: ${JSON.stringify({ text, chunk: text })}\n\n`);
           }
         }
-      } catch {
-        await streamFallbackMock(res, name, eventType, relevantPros[0] || salonsData[0], hairType);
-      }
-    } else {
+      } catch (geminiError) {
+    console.error('❌ GEMINI STREAM ERROR:', geminiError.message, geminiError.stack);
+    await streamFallbackMock(res, name, eventType, relevantPros[0] || salonsData[0], hairType);
+  }
+} else {
       await streamFallbackMock(res, name, eventType, relevantPros[0] || salonsData[0], hairType);
     }
 

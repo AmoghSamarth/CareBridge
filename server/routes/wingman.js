@@ -16,7 +16,7 @@ const salonsData = JSON.parse(fs.readFileSync(salonsPath, 'utf8'));
 // Trigger a new Wingman message generation (streaming SSE)
 router.post('/message', async (req, res, next) => {
   try {
-    const { userId, triggerType, userProfile } = req.body;
+    const { userId, triggerType, userProfile, userMessage } = req.body;
 
     if (!userId || !triggerType) {
       return res.status(400).json({
@@ -138,7 +138,9 @@ router.post('/message', async (req, res, next) => {
     const hairstyles = (hairstyleMap[hairType] || hairstyleMap['Wavy']);
     const suggestedStyles = hairstyles[eventType] || hairstyles['default'];
 
-    const prompt = `You are Wingman — CareBridge's AI grooming companion for Indian users in Tier-2 cities. Talk like a sharp, warm, direct friend. Always specific — reference name, event, budget, hair type. Never say "based on your profile" or "as your AI assistant". Keep every message under 4 sentences. End with one clear bookable action. Sound confident, warm, slightly informal.
+    const prompt = `You are Wingman — CareBridge's AI grooming companion for Indian users in Tier-2 cities. Talk like a sharp, warm, direct friend. Always specific — reference name, event, budget, hair type. Never say "based on your profile" or "as your AI assistant". Keep every message under 4 sentences. Sound confident, warm, slightly informal.
+
+${userMessage ? `${name} just said: "${userMessage}"` : ''}
 
 USER PROFILE:
 Name: ${name}
@@ -160,15 +162,7 @@ ${suggestedStyles.join(', ')}
 
 TRIGGER: ${triggerType}
 
-TRIGGER GUIDE:
-- onboarding_complete: Welcome them warmly, reference their ${eventType} in ${eventDate}, recommend 1 specific professional by name and area, ask to book
-- event_nudge: Their ${eventType} is coming up, create urgency, suggest a specific look (from hairstyles above), name 1 professional
-- post_booking: Congratulate on the booking, ask how it went, offer a quick tip for their hair type
-- recommendation_request: Pick the best 2 professionals from the list that match their budget, mention their services and rating, ask if they want to book either
-- check_in: Casual check-in about their grooming routine, reference when they last booked, suggest their next visit based on groom frequency
-- chat: User sent a message — respond conversationally as Wingman. If they ask about hairstyles, recommend from the list above. If they ask about availability or "who's available today", list professionals available. If they ask about salons/professionals, name specific pros from the salon context. Always end with a booking CTA.
-- reminder: Pre-appointment pep message — remind them what to prep before ${eventType}, suggest arriving fresh, wish them luck`;
-
+You're having an ongoing conversation with ${name}. Respond naturally to whatever they just said or asked — like a real friend who happens to know grooming and the local Nagpur scene well. Use the professional and hairstyle data above only when it's genuinely relevant to what they asked. Don't force a recommendation or booking pitch into every reply — sometimes just answer the question, share an opinion, or ask something back. Let the conversation breathe.`;
     if (process.env.GOOGLE_API_KEY) {
       try {
         const stream = await geminiModel.generateContentStream(prompt);

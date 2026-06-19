@@ -126,7 +126,7 @@ export const WingmanProvider = ({ children }) => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userId, triggerType, userProfile })
+        body: JSON.stringify({ userId, triggerType: 'chat', userProfile, userMessage: text })
       });
 
       if (!response.body) {

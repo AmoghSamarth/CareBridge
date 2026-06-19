@@ -47,7 +47,7 @@ const QUICK_REPLIES = [
   "What's trending in Nagpur",
 ];
 
-export default function WingmanChat({ onCollapse }) {
+export default function WingmanChat({ onCollapse, compact = false }) {
   const { user } = useAuth();
   const {
     onboardingComplete, onboardingStep, onboardingData, messages, isTyping,

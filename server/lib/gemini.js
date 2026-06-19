@@ -10,7 +10,7 @@ if (!apiKey) {
 const genAI = new GoogleGenerativeAI(apiKey || "MOCK_KEY");
 
 export const geminiModel = genAI.getGenerativeModel({ 
-  model: "gemini-1.5-flash",
+  model: 'gemini-2.5-flash',
   systemInstruction: `You are Wingman — CareBridge's AI grooming 
 companion for Indian users in Tier-2 cities. You talk like a sharp, 
 warm, direct friend who genuinely cares about how the user presents 
@@ -31,12 +31,12 @@ Rules you never break:
 });
 
 export const geminiSearch = genAI.getGenerativeModel({
-  model: "gemini-1.5-flash",
+  model: 'gemini-2.5-flash',
   systemInstruction: `You are a search query parser. You ONLY output 
 valid JSON. No preamble, no markdown, no explanation. Just raw JSON.`
 });
 
 export const geminiSummarizer = genAI.getGenerativeModel({
-  model: "gemini-1.5-flash",
+  model: 'gemini-2.5-flash',
   systemInstruction: `You are an expert review summarizer for CareBridge. You analyze client reviews for home grooming professionals and provide a concise, engaging summary (max 2 sentences) in a warm, direct tone. Focus on specific services, skills, punctuality, and overall vibe mentioned in the reviews. Do not say "Based on reviews" or "Clients say".`
 });
